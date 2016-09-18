@@ -1,0 +1,200 @@
+FOClient::AddAction
+	adres funkcji: FOnline 2.exe+878D1
+	przyjmuje FOClient*
+	_thiscall
+	
+FOClient::AddActioBack
+	adres: +879B1
+	przyjmuje FOClient*
+	_thiscall
+	
+FOClient::SetAction
+	adres: +8ADA1
+	przyjmuje FOClient*
+	_thiscall
+	
+drugie FOClient::SetAction
+	adres: fonline 2.exe+8DDE1
+	wywołuje powyższe
+	przyjmuje: FOClient*, kilka argumentów (opis niżej)
+	
+FOClient::GameLMouseDown
+	adres: fonline 2.exe+D5DD1
+	wywołuje SetAction w kilku różnych kontekstach
+	przyjmuje FOClient*
+	_thiscall
+	
+FOClient::AimLMouseUp
+	wywołuje SetAction
+	przyjmuje FOClient*
+	_thiscall
+	
+FOClient::ParseMouse
+	wywołuje GameLMouseDown w fonline 2.exe+97f02
+	wywołuje AimLMouseUp
+	adres fonline 2.exe+972B1
+	przyjmuje FOClient*
+	_thiscall
+	
+FOClient::MainLoop
+	fonline 2.exe+A7F71
+	wywołuje ParseMouse w fonline 2.exe+a822c = 004A822C
+	
+FOClient::IsAction
+	fonline 2.exe+72111
+	przyjmuje FOClient* + jeden argument na stosie (co?)
+	_thiscall
+	powinien zwrócić: czy nie był w trakcie ruchu?
+	
+Timer::FastTick
+	zwraca czas
+	_stdcall (chyba)
+	brak argumentów
+	
+main
+	+111741
+	wywołuje MainLoop w +111B7F
+	
+FOnline 2.exe+111B17 - 68 50B80000           - push 0000B850 { 47184 }
+FOnline 2.exe+111B1C - E8 58131800           - call "FOnline 2.operator new"
+
+FOClient ma 47184 bajty?
+
+w +79E2F ustawione "pChosen"
+
+FOnline 2.stlp_std::vector<FOClient::ActionEvent,stlp_std::allocator<FOClient::ActionEvent> >::_M_insert_overflow - 55                    - push ebp
+	FOnline 2.exe+79D01
+	+87999 wywołanie w AddAction
+	dostaje FOClient+934 ("Chosen")
+
+zmienić na losowe stringi przed uruchomieniem, żeby multi-log:
+	fonline_instance address
+	fonline 2.exe+3433B4 = 7433b4
+
+	_fosync_ address
+	fonline 2.exe+33BCDC = 73bcdc
+
+aimed attack w funkcji AimLMouseUp
+
+FOClient + 240: typ wybranej akcji (myszka)
+	3 = atak
+	1 = ruch
+	0 = zwykły wskaźnik
+	6 = rączka w inventory
+	4 = użycie skilla
+	5 pojawia się na chwilę zaraz po użyciu skilla?
+
+FOClient + 244: poprzedni typ wybranej akcji?. Po co?
+
+argumenty przekazywane do SetAction na stosie, od lewej do prawej:
+1. typ akcji
+	1 = ACTION_MOVE
+	6 = atak bez aima (??) (może być autoaim)
+	10 = skill
+2. zależnie od typu akcji:
+	jeśli ruch, to wsp. 1
+	jeśli atak, to 0
+	jeśli skill, to jaki skill
+3. zależnie od typu akcji:
+	jeśli ruch, to wsp. 2
+	jeśli atak, to 3e9?
+	jeśli skill, to critter id? to samo 5. w przypadku ataku
+4. zależnie od typu akcji:
+	jeśli ruch, to 1 = bieg, 0 = chód
+	jeśli atak, to zawsze 2
+	jeśli skill, to zawsze 0?
+5. zależnie od typu akcji:
+	jeśli ruch, to zawsze 0
+	jeśli atak:
+		np. 10c90. critter id?
+		call HexManager::GetCritterPixel - zapisuje wynik w eax
+			ten wynik wskazuje na critter?
+			zmienia się przy innych celach
+		mov eax,[eax]
+			jakiś critter ID?
+			też się zmienia
+		push eax
+		jeszcze jest GetSmthPixel...
+	jeśli skill, to zawsze 0?
+6.
+	jeśli ruch, to czy nie był już w trakcie ruchu
+	jeśli skill, to zawsze 0?
+	jeśli atak:
+		w zwykłym trybie zawsze 0, mimo że autoaim
+		w trybie celowania - zależy od celu. 1 BAJT
+			torso 0x40
+			groin 0x80
+			left arm 0x20
+			left leg 0x60
+			right leg 0x50
+			right arm 0x30
+			eyes 0x70
+			head 0x10
+		tryb celowania to inny przypadek
+		mov ecx, [esi+b7d8]
+			esi = FOClient
+		mov edx, [ecx+10ac]
+		movzx ecx,byte ptr [edx+30]
+		push ecx
+7.
+	jeśli ruch, to czas
+	jeśli skill, to zawsze 0?
+	jeśli atak, to zawsze 0
+	
+	
+CE auto-assemble na ruch:
+
+alloc(newmem,2048)
+alloc(run, 4)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+run:
+dd 1
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+cmp [run],1
+jne originalcode
+
+push eax
+push ebx
+push edx
+
+call 00538940 //Timer::FastTick
+push eax //time
+
+push 1
+mov ecx,esi
+call 00472110 // FOClient::IsAction
+test eax,eax
+sete al
+push eax // czy nie byl w trakcie ruchu
+
+push 0
+push 1 // czy ma biec
+push 30
+push 52
+push 1 // ACTION_MOVE
+mov ecx,esi
+call 0048DDE0 // FOClient::SetAction
+
+pop edx
+pop ebx
+pop eax
+
+mov [run],0
+
+originalcode:
+mov ecx,esi
+call "FOnline 2.FOClient::ParseMouse"
+
+exit:
+jmp returnhere
+
+"FOnline 2.exe"+A822A:
+jmp newmem
+nop
+nop
+returnhere:
