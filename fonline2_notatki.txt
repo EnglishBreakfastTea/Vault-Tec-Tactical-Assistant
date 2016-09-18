@@ -141,6 +141,19 @@ argumenty przekazywane do SetAction na stosie, od lewej do prawej:
 	jeśli skill, to zawsze 0?
 	jeśli atak, to zawsze 0
 	
+HexManager::GetSmthPixel
+	_thiscall
+	wywoływane cały czas, m. in. w GameLMouseDown w różnych kontekstach, przed wywołaniem SetAction
+	wyniki zwraca przez referencję.
+argumenty przekazywane do HexManager::GetSmthPixel od lewej do prawej:
+1. FOClient* + 20 = HexManager*
+2. mouse x
+3. mouse y
+4. referencja dla wsk. do przedmiotu (gdyby pod pikselem nie było crittera)
+5. referencja dla wsk. do crittera
+
+FOClient:
+	w 0x20 HexManager
 	
 CE auto-assemble na ruch:
 
