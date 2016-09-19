@@ -9,7 +9,7 @@ FOClient::AddActioBack
 	_thiscall
 	
 FOClient::SetAction
-	adres: +8ADA1
+	adres: fonline 2.exe+8ADA1
 	przyjmuje FOClient*
 	_thiscall
 	
@@ -83,6 +83,7 @@ FOClient + 240: typ wybranej akcji (myszka)
 	6 = rączka w inventory
 	4 = użycie skilla
 	5 pojawia się na chwilę zaraz po użyciu skilla?
+brakuje: use on (to samo co skill?), otwarta rączka (gdy np. ścinamy drzewo)
 
 FOClient + 244: poprzedni typ wybranej akcji?. Po co?
 
@@ -93,11 +94,23 @@ argumenty przekazywane do SetAction na stosie, od lewej do prawej:
 	10 = skill
 2. zależnie od typu akcji:
 	jeśli ruch, to wsp. 1
-	jeśli atak, to 0
+	jeśli atak, to:
+		mov edx, [ecx+10ac] hand?
+		mov ecx, [edx]
+		push ecx
+		jakiś identyfikator (przedmiotu? itemId?)
 	jeśli skill, to jaki skill
 3. zależnie od typu akcji:
 	jeśli ruch, to wsp. 2
-	jeśli atak, to 3e9?
+	jeśli atak, to:
+		esi = FOClient
+		mov ecx, [esi+b7d8] Critter gracz
+		mov edx, [ecx+10ac] hand?
+		mov ecx, [edx+4] item?
+		movzx eax, word ptr [ecx]
+		push eax
+		
+		itemID? (ale coś innego niż to wyżej)
 	jeśli skill, to critter id? to samo 5. w przypadku ataku
 4. zależnie od typu akcji:
 	jeśli ruch, to 1 = bieg, 0 = chód
@@ -152,8 +165,31 @@ argumenty przekazywane do HexManager::GetSmthPixel od lewej do prawej:
 4. referencja dla wsk. do przedmiotu (gdyby pod pikselem nie było crittera)
 5. referencja dla wsk. do crittera
 
+HexManager::GetCritter
+	adres +800c0
+	_thiscall
+	wywoływane np. w CrittersProcess przy rozpoczęciu akcji
+	zwraca strukturę Critter
+	jeden argument: id crittera
+	
+	crittery są trzymane w uporządkowanej według id liście podwójnie łączonej
+	szukanie zaczyna się ze środka listy, HexManager + 10C
+	jest jeszcze drugi wskaźnik w HexManager + 110, niby początek listy...
+	w algorytmie dzieją się dziwne rzeczy.
+
+
 FOClient:
 	w 0x20 HexManager
+	
+HexManager:
+	w 0x120 critterId gracza (może być to pamięć FOClient, ale raczej nie)
+	
+ItemManager: co to jest?
+ItemManager::GetProtoItem
+	_thiscall
+	adres +10d1b0
+	przyjmuje jeden argument: identyfikator przedmiotu? przekazywany potem do SetAction
+	co to jest ProtoItem?
 	
 CE auto-assemble na ruch:
 
