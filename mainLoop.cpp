@@ -63,27 +63,26 @@ void attack(FOClient* client, uint32_t critterId)
 Critter* critterUnderMouse(HexManager* hexManager)
 {
     Object* obj = nullptr;
-    Critter* critt = nullptr;
-    getSmthPixel(hexManager, *mouseX, *mouseY, obj, critt);
+    Critter* critter = nullptr;
+    getSmthPixel(hexManager, *mouseX, *mouseY, obj, critter);
 
-    if (!critt) {
+    if (!critter) {
         return nullptr;
     }
 
-    return critt;
+    return critter;
 }
 
-bool crittersNeighbours(HexManager* hexManager, uint32_t id1, uint32_t id2)
+bool crittersNeighbours(Critter* critter1, Critter* critter2)
 {
-    auto static evenXDeltas = std::array<std::pair<int, int>, 6>
-            {{{1,0}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}}};
-    auto static oddXDeltas = std::array<std::pair<int, int>, 6>
-            {{{1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}}};
+    assert(critter1);
+    assert(critter2);
 
-    auto critter1 = getCritter(hexManager, id1);
-    auto critter2 = getCritter(hexManager, id2);
-
-    printf("critter1: %u, %u; critter2: %u, %u\n", critter1->x, critter1-> y, critter2->x, critter2->y);
+    // A critter will always be near itself.
+    auto static evenXDeltas = std::array<std::pair<int, int>, 7>
+            {{{0, 0}, {1,0}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}}};
+    auto static oddXDeltas = std::array<std::pair<int, int>, 7>
+            {{{0, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}}};
 
     if (critter1->x % 2 == 0) {
         return std::any_of(std::begin(evenXDeltas), std::end(evenXDeltas), [=](auto delta) {
@@ -98,10 +97,12 @@ bool crittersNeighbours(HexManager* hexManager, uint32_t id1, uint32_t id2)
     });
 }
 
-bool playerNear(HexManager* hexManager, uint32_t critterId)
+bool playerNear(HexManager* hexManager, Critter* critter)
 {
-    auto playerCritterId = hexManager->playerCritterId;
-    return crittersNeighbours(hexManager, critterId, playerCritterId);
+    assert(critter);
+
+    auto playerCritter = getCritter(hexManager, hexManager->playerCritterId);
+    return crittersNeighbours(critter, playerCritter);
 }
 
 /* A ComplexAction is a (non-trivial) algorithm that performs (multiple) FOnline actions.
@@ -119,11 +120,26 @@ public:
     HexAttack(uint32_t critterId)
         : critterId(critterId)
     {
+        printf("starting HexAttack\n");
     }
 
     bool frame(FOClient* client) override
     {
-        return true;
+        auto critter = getCritter(&client->hexManager, critterId);
+
+        if (!critter) {
+            printf("HexAttack: lost the critter.\n");
+            return true;
+        }
+
+        if (playerNear(&client->hexManager, critter)) {
+            printf("HexAttack: near, attacking!\n");
+            attack(client, critter->critterId);
+            return true;
+        }
+
+        move(client, critter->x, critter->y);
+        return false;
     }
 
 private:
@@ -181,7 +197,11 @@ void mainLoop(FOClient* client)
 
     if (!msg) {
         if (state->complexAction) {
-            state->complexAction->frame(client);
+            auto actionFinished = state->complexAction->frame(client);
+            if (actionFinished) {
+                printf("Complex action finished\n");
+                state->complexAction = nullptr;
+            }
         }
 
         return;
@@ -226,7 +246,7 @@ void mainLoop(FOClient* client)
                 return;
             }
 
-            if (playerNear(&client->hexManager, critter->critterId)) {
+            if (playerNear(&client->hexManager, critter)) {
                 printf("near!\n");
             } else {
                 printf("not near\n");
