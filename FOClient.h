@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+/* Structures and functions mapping to the FOnline client code. Plus some high-level wrappers. */
+
 struct Item {
     uint32_t itemId;
 };
@@ -31,12 +33,18 @@ struct Critter {
 };
 
 struct HexManager {
+    Critter* critterUnderMouse();
+    bool playerNear(Critter*);
+
     uint32_t _padding[72];
     uint32_t playerCritterId; // could be inside FOClient
     // 73 * 4 = 292
 };
 
 struct FOClient {
+    void move(uint32_t x, uint32_t y);
+    void attack(uint32_t critterId);
+
     uint32_t _padding1[8]; // 8 * 4 = 32
     HexManager hexManager; // at 0x20
     // 32 + 292 = 324 = 81 * 4
@@ -45,19 +53,21 @@ struct FOClient {
     Critter* playerCritter; // at 0xb7d8
 };
 
+bool crittersNeighbours(Critter*, Critter*);
+
 using FastTick = uint32_t (_stdcall *)();
 using IsAction = uint32_t (_thiscall *)(FOClient*, uint32_t);
 using SetAction = void (_thiscall *)(FOClient*, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
 using GetSmthPixel = void (_thiscall *)(HexManager*, uint32_t mouseX, uint32_t mouseY, Object*&, Critter*&);
 using GetCritter = Critter* (_thiscall *)(HexManager*, uint32_t critterId);
 
-uint32_t const FastTickAddr = 0x00538940;
-uint32_t const IsActionAddr = 0x00472110;
-uint32_t const SetActionAddr = 0x0048DDE0;
-uint32_t const GetSmthPixelAddr = 0x00504C40;
-uint32_t const GetCritterAddr = 0x004800C0;
+extern FastTick fastTick;
+extern IsAction isAction;
+extern SetAction setAction;
+extern GetSmthPixel getSmthPixel;
+extern GetCritter getCritter;
 
-uint32_t const MouseXAddr = 0x008520C4;
-uint32_t const MouseYAddr = 0x008520C8;
+extern uint32_t* const mouseX;
+extern uint32_t* const mouseY;
 
 #endif //_FOCLIENT_H
