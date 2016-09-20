@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <array>
 
-/* Move the player to the given position. */
 void FOClient::move(uint32_t x, uint32_t y)
 {
     auto time = fastTick();
@@ -16,7 +15,6 @@ void FOClient::move(uint32_t x, uint32_t y)
     setAction(this, ACTION_MOVE, x, y, run, 0, !moving, time);
 }
 
-/* Attack the given critter using the in-game attack mode (e.g. burst) */
 void FOClient::attack(uint32_t critterId)
 {
     auto ACTION_ATTACK = 6u;

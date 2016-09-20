@@ -33,7 +33,10 @@ struct Critter {
 };
 
 struct HexManager {
+    /* Returns the critter currently pointed by the mouse cursor or nullptr if there is none. */
     Critter* critterUnderMouse();
+
+    /* Check if the distance between the player and the given critter is <= 1 hex (can be 0 if critter = player). */
     bool playerNear(Critter*);
 
     uint32_t _padding[72];
@@ -42,7 +45,10 @@ struct HexManager {
 };
 
 struct FOClient {
+    /* Move the player to the given position. */
     void move(uint32_t x, uint32_t y);
+
+    /* Attack the given critter using the in-game attack mode (e.g. burst) */
     void attack(uint32_t critterId);
 
     uint32_t _padding1[8]; // 8 * 4 = 32
@@ -53,8 +59,10 @@ struct FOClient {
     Critter* playerCritter; // at 0xb7d8
 };
 
+/* Check if the distance between two critters is 1 hex. */
 bool crittersNeighbours(Critter*, Critter*);
 
+/* In-game functions. */
 using FastTick = uint32_t (_stdcall *)();
 using IsAction = uint32_t (_thiscall *)(FOClient*, uint32_t);
 using SetAction = void (_thiscall *)(FOClient*, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
