@@ -33,10 +33,10 @@ void move(FOClient* client, uint32_t x, uint32_t y)
     setAction(client, ACTION_MOVE, x, y, run, 0, !moving, time);
 }
 
+/* Attack the given critter using the in-game attack mode (e.g. burst) */
 void attack(FOClient* client, uint32_t critterId)
 {
     auto ACTION_ATTACK = 6u;
-    auto NO_AIM = 0u;
 
     auto playerCritter = client->playerCritter;
     if (!playerCritter) {
@@ -50,6 +50,8 @@ void attack(FOClient* client, uint32_t critterId)
         return;
     }
 
+    auto mode = hand->mode;
+
     auto heldItem = hand->heldItem;
     if (!heldItem) {
         // an empty hand should also be an item
@@ -57,7 +59,7 @@ void attack(FOClient* client, uint32_t critterId)
         return;
     }
 
-    setAction(client, ACTION_ATTACK, hand->handItemId, heldItem->itemId, 2, critterId, NO_AIM, 0);
+    setAction(client, ACTION_ATTACK, hand->handItemId, heldItem->itemId, 2, critterId, mode, 0);
 }
 
 Critter* critterUnderMouse(HexManager* hexManager)

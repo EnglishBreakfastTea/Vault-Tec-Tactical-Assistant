@@ -8,8 +8,12 @@ struct Item {
 };
 
 struct Hand { // I don't know what this is, but it points to the held item, so I called it Hand.
-    uint32_t handItemId; // ??
+    uint32_t handItemId; // Don't know how I should call it.
     Item* heldItem;
+    // 4 * 2 = 8
+    uint32_t _padding[10]; // 40
+    // 8 + 40 = 48 = 4 * 12
+    uint8_t mode;
 };
 
 struct Object; // from a Xander Root lying on the ground to a standing Wagon

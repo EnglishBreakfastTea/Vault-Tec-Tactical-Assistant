@@ -133,7 +133,10 @@ argumenty przekazywane do SetAction na stosie, od lewej do prawej:
 	jeśli ruch, to czy nie był już w trakcie ruchu
 	jeśli skill, to zawsze 0?
 	jeśli atak:
-		w zwykłym trybie zawsze 0, mimo że autoaim
+		w zwykłym trybie 0 - single, 1 - burst, nawet jak autoaim
+			mov edx, [ecx+10ac] hand?
+			movzx ecx, byte ptr [edx+30] attack mode
+			push ecx
 		w trybie celowania - zależy od celu. 1 BAJT
 			torso 0x40
 			groin 0x80
@@ -190,60 +193,3 @@ ItemManager::GetProtoItem
 	adres +10d1b0
 	przyjmuje jeden argument: identyfikator przedmiotu? przekazywany potem do SetAction
 	co to jest ProtoItem?
-	
-CE auto-assemble na ruch:
-
-alloc(newmem,2048)
-alloc(run, 4)
-label(returnhere)
-label(originalcode)
-label(exit)
-
-run:
-dd 1
-
-newmem: //this is allocated memory, you have read,write,execute access
-//place your code here
-cmp [run],1
-jne originalcode
-
-push eax
-push ebx
-push edx
-
-call 00538940 //Timer::FastTick
-push eax //time
-
-push 1
-mov ecx,esi
-call 00472110 // FOClient::IsAction
-test eax,eax
-sete al
-push eax // czy nie byl w trakcie ruchu
-
-push 0
-push 1 // czy ma biec
-push 30
-push 52
-push 1 // ACTION_MOVE
-mov ecx,esi
-call 0048DDE0 // FOClient::SetAction
-
-pop edx
-pop ebx
-pop eax
-
-mov [run],0
-
-originalcode:
-mov ecx,esi
-call "FOnline 2.FOClient::ParseMouse"
-
-exit:
-jmp returnhere
-
-"FOnline 2.exe"+A822A:
-jmp newmem
-nop
-nop
-returnhere:
