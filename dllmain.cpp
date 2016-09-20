@@ -10,6 +10,8 @@
  * E8 7FF0FEFF           - call "FOnline 2.FOClient::ParseMouse" = 0x004972B0
  */
 
+/* We insert a call to our code (mainLoop) before the call to ParseMouse. */
+
 DWORD mainLoopInjAddress = 0x004A822C;
 int mainLoopInjNopCount = 0;
 extern "C" {
@@ -19,28 +21,71 @@ extern "C" {
 __asm(
 ".globl _mainLoopInjCode\n"
 "_mainLoopInjCode:\n"
-    "pushad;"
-    "pushfd;"
-    "push ecx;" // FOClient* argument
-    "call _mainLoopCWrapper@4;"
-    "popfd;"
-    "popad;"
+"pushad;"
+"pushfd;"
+"push ecx;" // FOClient* argument
+"call _mainLoopCWrapper@4;"
+"popfd;"
+"popad;"
 
-    "push eax;"
-    "mov eax, 0x004972B0;"
-    "call eax;"
-    "pop eax;"
-    "ret;"
+"push eax;"
+"mov eax, 0x004972B0;"
+"call eax;"
+"pop eax;"
+"ret;"
 );
 
-/*DWORD lMouseDownInjAddress = 0x0;
+/* GameLMouseDown call at 0x497f02:
+ * 8B CE                 - mov ecx,esi
+ * E8 C9DE0300           - call "FOnline 2.FOClient::GameLMouseDown" = 0x004D5DD0
+ */
+
+/* We insert a call to our code (lMouseDown) before the call to GameLMouseDown.
+ * The code may decide for the call to GameLMouseDown to not be performed. */
+
+bool lMouseDown(FOClient*)
+{
+    printf("lMouseDown\n");
+    return true;
+}
+
+DWORD lMouseDownInjAddress = 0x497f02;
 int lMouseDownInjNopCount = 0;
-extern "C" { void lMouseDownInjCode(void); }
+extern "C" {
+    /* Returns 1 if the GameLMouseDown call should be performed, 0 otherwise. */
+    DWORD _stdcall lMouseDownCWrapper(FOClient* client) { return lMouseDown(client); }
+    void lMouseDownInjCode(void);
+}
 __asm(
-".globl lMouseDownInjCode"
-"_lMouseDownInjCode:"
-"   ret"
-);*/
+".globl _lMouseDownInjCode\n"
+"_lMouseDownInjCode:\n"
+"push ebp;"
+"mov ebp, esp;"
+"sub esp, 4;"
+"pushad;"
+"pushfd;"
+"push ecx;" // FOClient*
+"call _lMouseDownCWrapper@4;"
+"mov [ebp-4], eax;" // get the returned value
+"popfd;"
+"popad;"
+
+"push eax;"
+"mov eax, [ebp-4];"
+"cmp eax, 0;"
+"pop eax;"
+"je vtta_lmd_end;"
+
+"push eax;"
+"mov eax, 0x004D5DD0;"
+"call eax;"
+"pop eax;"
+
+"vtta_lmd_end:"
+"mov esp, ebp;"
+"pop ebp;"
+"ret;"
+);
 
 void writeBytes(DWORD destAddr, void* patch, int numBytes)
 {
@@ -107,6 +152,6 @@ BOOL APIENTRY DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
     if (reason == DLL_PROCESS_ATTACH) {
         createConsole();
         cave(mainLoopInjAddress, mainLoopInjCode, mainLoopInjNopCount);
-        //cave(lMouseDownInjAddress, lMouseDownInjCode, lMouseDownInjNopCount);
+        cave(lMouseDownInjAddress, lMouseDownInjCode, lMouseDownInjNopCount);
     }
 }
