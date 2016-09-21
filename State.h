@@ -22,6 +22,7 @@ public:
     /* The currently performed complexAction or nullptr if there is none. */
     std::unique_ptr<ComplexAction> complexAction;
 private:
+    /* The message queue used to communicate with the UI. */
     boost::interprocess::message_queue mq;
 };
 
