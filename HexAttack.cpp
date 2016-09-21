@@ -14,6 +14,11 @@ bool HexAttack::frame(FOClient* client)
 {
     auto critter = getCritter(&client->hexManager, critterId);
 
+    if (client->gameMode != IN_ENCOUNTER) {
+        printf("HexAttack: not inside encounter.\n");
+        return true;
+    }
+
     if (!critter) {
         printf("HexAttack: lost the critter.\n");
         return true;
