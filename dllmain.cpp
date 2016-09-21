@@ -87,6 +87,43 @@ __asm(
 "ret;"
 );
 
+/* RunPrepared call at 0x468ec2:
+ * C6 05 9CC38300 01     - mov byte ptr ["FOnline 2.FOClient::SpritesCanDraw"],01
+ * E8 01FA0A00           - call "FOnline 2.Script::SetArgUInt"
+ * 83 C4 04              - add esp,04
+ * E8 192B0B00           - call "FOnline 2.Script::RunPrepared" = 0x0051B9E0
+ */
+
+/* We insert a call to our code (drawIface) before the call to RunPrepared. */
+
+void drawIface()
+{
+    // TODO: check if not inside menu or on world map.
+    drawString("VTTA", 100, 100, 100, 100, GREEN, NORMAL, BORDER);
+}
+
+DWORD drawIfaceInjAddress = 0x468ec2;
+int drawIfaceInjNopCount = 0;
+extern "C" {
+    void _stdcall drawIfaceCWrapper() { drawIface(); }
+    void drawIfaceInjCode(void);
+}
+__asm(
+".globl _drawIfaceInjCode\n"
+"_drawIfaceInjCode:\n"
+"pushad;"
+"pushfd;"
+"call _drawIfaceCWrapper@0;"
+"popfd;"
+"popad;"
+
+"push eax;"
+"mov eax, 0x0051B9E0;"
+"call eax;"
+"pop eax;"
+"ret;"
+);
+
 void writeBytes(DWORD destAddr, void* patch, int numBytes)
 {
     DWORD oldProtect = 0;
@@ -153,5 +190,6 @@ BOOL APIENTRY DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
         createConsole();
         cave(mainLoopInjAddress, mainLoopInjCode, mainLoopInjNopCount);
         cave(lMouseDownInjAddress, lMouseDownInjCode, lMouseDownInjNopCount);
+        cave(drawIfaceInjAddress, drawIfaceInjCode, drawIfaceInjNopCount);
     }
 }

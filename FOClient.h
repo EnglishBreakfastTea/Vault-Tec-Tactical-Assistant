@@ -2,6 +2,7 @@
 #define _FOCLIENT_H
 
 #include <cstdint>
+#include <string>
 
 /* Structures and functions mapping to the FOnline client code. Plus some high-level wrappers. */
 
@@ -59,8 +60,18 @@ struct FOClient {
     Critter* playerCritter; // at 0xb7d8
 };
 
+/* String structure mimicking the one passed to DrawText. */
+struct DrawTextString {
+    uint32_t _padding[6];
+    const char* text; // at 0x18
+};
+
 /* Check if the distance between two critters is 1 hex. */
 bool crittersNeighbours(Critter*, Critter*);
+
+/* Wrapper for Global_DrawText using std::string for passing the text and ignoring the return value. */
+void drawString(std::string, uint32_t x, uint32_t y, uint32_t width, uint32_t height,
+                uint32_t color, uint32_t font, uint32_t flags);
 
 /* In-game functions. */
 using FastTick = uint32_t (_stdcall *)();
@@ -68,13 +79,32 @@ using IsAction = uint32_t (_thiscall *)(FOClient*, uint32_t);
 using SetAction = void (_thiscall *)(FOClient*, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
 using GetSmthPixel = void (_thiscall *)(HexManager*, uint32_t mouseX, uint32_t mouseY, Object*&, Critter*&);
 using GetCritter = Critter* (_thiscall *)(HexManager*, uint32_t critterId);
+using Global_DrawText = uint32_t (_cdecl *)(DrawTextString*, uint32_t x, uint32_t y, uint32_t width, uint32_t height,
+                                            uint32_t color, uint32_t font, uint32_t flags);
 
 extern FastTick fastTick;
 extern IsAction isAction;
 extern SetAction setAction;
 extern GetSmthPixel getSmthPixel;
 extern GetCritter getCritter;
+extern Global_DrawText global_drawText;
 
+/* Flags passed to drawText. */
+extern uint32_t const HALIGN_MIDDLE;
+extern uint32_t const VALIGN_MIDDLE;
+extern uint32_t const HALIGN_RIGHT;
+extern uint32_t const VALIGN_RIGHT;
+extern uint32_t const VALIGN_RIGHT;
+extern uint32_t const BORDER;
+
+/* Common colors passed to drawText. */
+extern uint32_t const GREEN;
+extern uint32_t const GRAY;
+
+/* Common fonts passed to drawText. */
+extern uint32_t const NORMAL; // Don't know how to call it.
+
+/* Constant in-game addresses. */
 extern uint32_t* const mouseX;
 extern uint32_t* const mouseY;
 

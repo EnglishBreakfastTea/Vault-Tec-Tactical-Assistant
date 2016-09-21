@@ -193,3 +193,54 @@ ItemManager::GetProtoItem
 	adres +10d1b0
 	przyjmuje jeden argument: identyfikator przedmiotu? przekazywany potem do SetAction
 	co to jest ProtoItem?
+
+FOClient::SScriptFunc::Global_DrawText
+	_cdecl
+	fonline 2.exe+763e0
+	wymaga FOClient::SpritesCanDraw == 1
+	ustawione w FOClient::DrawIfaceLayer (adres +68E90):
+		mov byte ptr ["FOnline 2.FOClient::SpritesCanDraw"],01
+		call "FOnline 2.Script::SetArgUInt"
+		add esp,04
+		call "FOnline 2.Script::RunPrepared"
+		mov byte ptr ["FOnline 2.FOClient::SpritesCanDraw"],00
+
+	argumenty:
+		1. tekst
+			może w nim wystąpić specyfikacja koloru: "|liczba tekst"
+
+			użycie argumentu w funkcji:
+			mov eax,[ebp+8]
+			mov ecx,[eax+18]
+			push ecx
+			ecx w tym momencie wskazuje na tekst do wypisania.
+			w wielu przypadkach ecx = eax+4 dla krótkich stringów
+			std::string i Short String Optimization?
+			ale tak jest też w przypadku "Registration" - dł. 12, za dużo na SSO
+			może implementacja MSVC pozwala na dłuższe stringi...
+			chyba tak jest: dla stringa "Hub and San Francisco..." ecx leży w zupełnie innym miejscu.
+		2. pozycja x
+		3. pozycja y
+		4. szerokość
+		5. wysokość
+		6. specyfikacja koloru np. 0xff00aa00, 0xff8f6f0, 0xffababab, 0xffffffff
+			w tekście też może wystąpić specyfikacja koloru (w formacie dziesiętnym), która ma pierwszeństwo
+		7. czcionka
+			0xFFADADB9 - kolor szary
+			0xFF00AA00 - zielony używany w wielu miejscach
+		8. ciąg flag bitowych
+			4 = 3. bit wyśrodkowanie w poziomie
+			8 = 4. bit wyśrodkowanie w pionie
+			16 = 5. bit do prawej, wyśrodkowanie ma pierwszeństwo
+			32 = 6. bit do dołu, wyśrodkowanie ma pierwszeństwo
+			512 = 9. bit obramowanie
+
+			np. "First Aid:" 560 = 100110000 = 512 + 32 + 16
+			"Aim: Eyes" 12 = 8 + 4
+			nick: 548 = 512 + 32 + 4
+
+		przykłady: (2. 4. 5. 3. 6. 8. 7. 1.)
+			74 128 25 375 0xff00aa00 4 7 Registration
+			74 128 25 405 0xff00aa00 4 7 Options
+			0 800 20 40 0xff00c800 524 5 "Hub and NCR..."
+			0 800 20 60 0xff00c800 524 5 "Convoy transport..."

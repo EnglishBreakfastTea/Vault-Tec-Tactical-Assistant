@@ -87,11 +87,19 @@ bool HexManager::playerNear(Critter* critter)
     return crittersNeighbours(critter, playerCritter);
 }
 
+void drawString(std::string str, uint32_t x, uint32_t y, uint32_t width, uint32_t height,
+                uint32_t color, uint32_t font, uint32_t flags)
+{
+    DrawTextString _str{{0}, str.data()};
+    global_drawText(&_str, x, y, width, height, color, font, flags);
+}
+
 uint32_t constexpr FastTickAddr = 0x00538940;
 uint32_t constexpr IsActionAddr = 0x00472110;
 uint32_t constexpr SetActionAddr = 0x0048DDE0;
 uint32_t constexpr GetSmthPixelAddr = 0x00504C40;
 uint32_t constexpr GetCritterAddr = 0x004800C0;
+uint32_t constexpr DrawTextAddr = 0x004763E0;
 
 uint32_t constexpr MouseXAddr = 0x008520C4;
 uint32_t constexpr MouseYAddr = 0x008520C8;
@@ -101,6 +109,18 @@ IsAction isAction = reinterpret_cast<IsAction>(IsActionAddr);
 SetAction setAction = reinterpret_cast<SetAction>(SetActionAddr);
 GetSmthPixel getSmthPixel = reinterpret_cast<GetSmthPixel>(GetSmthPixelAddr);
 GetCritter getCritter = reinterpret_cast<GetCritter>(GetCritterAddr);
+Global_DrawText global_drawText = reinterpret_cast<Global_DrawText>(DrawTextAddr);
+
+uint32_t const HALIGN_MIDDLE = 4;
+uint32_t const VALIGN_MIDDLE = 8;
+uint32_t const HALIGN_RIGHT = 16;
+uint32_t const VALIGN_RIGHT = 32;
+uint32_t const BORDER = 512;
+
+uint32_t const GREEN = 0xFF00AA00;
+uint32_t const GRAY =  0xFFADADB9;
+
+uint32_t const NORMAL = 5;
 
 uint32_t* const mouseX = reinterpret_cast<uint32_t*>(MouseXAddr);
 uint32_t* const mouseY = reinterpret_cast<uint32_t*>(MouseYAddr);
