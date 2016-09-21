@@ -67,13 +67,13 @@ bool crittersNeighbours(Critter* critter1, Critter* critter2)
             {{{0, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {0, 1}, {1, 0}}};
 
     if (critter1->x % 2 == 0) {
-        return std::any_of(std::begin(evenXDeltas), std::end(evenXDeltas), [=](auto delta) {
+        return std::any_of(std::begin(evenXDeltas), std::end(evenXDeltas), [critter1, critter2](auto delta) {
             return critter1->x + delta.first == critter2->x
                    && critter1->y + delta.second == critter2->y;
         });
     }
 
-    return std::any_of(std::begin(oddXDeltas), std::end(oddXDeltas), [=](auto delta) {
+    return std::any_of(std::begin(oddXDeltas), std::end(oddXDeltas), [critter1, critter2](auto delta) {
         return critter1->x + delta.first == critter2->x
                && critter1->y + delta.second == critter2->y;
     });
