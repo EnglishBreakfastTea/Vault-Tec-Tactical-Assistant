@@ -96,16 +96,17 @@ __asm(
 
 /* We insert a call to our code (drawIface) before the call to RunPrepared. */
 
-void drawIface()
+void drawIface(FOClient* client)
 {
-    // TODO: check if not inside menu or on world map.
-    drawString("VTTA", 100, 100, 100, 100, GREEN, NORMAL, BORDER);
+    if (client->gameMode == IN_ENCOUNTER) {
+        drawString("VTTA", 100, 100, 100, 100, GREEN, NORMAL, BORDER);
+    }
 }
 
 DWORD drawIfaceInjAddress = 0x468ec2;
 int drawIfaceInjNopCount = 0;
 extern "C" {
-    void _stdcall drawIfaceCWrapper() { drawIface(); }
+    void _stdcall drawIfaceCWrapper(FOClient* client) { drawIface(client); }
     void drawIfaceInjCode(void);
 }
 __asm(
@@ -113,7 +114,8 @@ __asm(
 "_drawIfaceInjCode:\n"
 "pushad;"
 "pushfd;"
-"call _drawIfaceCWrapper@0;"
+"push esi;" // FOClient*
+"call _drawIfaceCWrapper@4;"
 "popfd;"
 "popad;"
 

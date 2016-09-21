@@ -111,6 +111,11 @@ GetSmthPixel getSmthPixel = reinterpret_cast<GetSmthPixel>(GetSmthPixelAddr);
 GetCritter getCritter = reinterpret_cast<GetCritter>(GetCritterAddr);
 Global_DrawText global_drawText = reinterpret_cast<Global_DrawText>(DrawTextAddr);
 
+uint32_t const IN_MENU = 1;
+uint32_t const IN_ENCOUNTER = 5;
+uint32_t const ON_WORLD_MAP = 6;
+uint32_t const LOADING = 7;
+
 uint32_t const HALIGN_MIDDLE = 4;
 uint32_t const VALIGN_MIDDLE = 8;
 uint32_t const HALIGN_RIGHT = 16;

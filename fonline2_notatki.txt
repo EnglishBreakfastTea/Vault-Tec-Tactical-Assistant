@@ -183,6 +183,12 @@ HexManager::GetCritter
 
 FOClient:
 	w 0x20 HexManager
+	w 0x23c czy menu/WM/enco itd.
+		menu = 1
+		enco = 5
+		WM = 6
+		ładowanie = 7
+	w 0xb7d8 Critter* gracza (a może to jest w HexManager?)
 	
 HexManager:
 	w 0x120 critterId gracza (może być to pamięć FOClient, ale raczej nie)

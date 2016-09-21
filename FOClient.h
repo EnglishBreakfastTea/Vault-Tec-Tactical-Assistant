@@ -52,12 +52,15 @@ struct FOClient {
     /* Attack the given critter using the in-game attack mode (e.g. burst) */
     void attack(uint32_t critterId);
 
-    uint32_t _padding1[8]; // 8 * 4 = 32
+    uint32_t _padding1[8]; // * 4 = 32
     HexManager hexManager; // at 0x20
-    // 32 + 292 = 324 = 81 * 4
-    uint32_t _padding2[11685]; // 46740
-    // 324 + 46740 = 47064 = 4 * 11766
+    // 292 + 32 = 324 = 81 * 4
+    uint32_t _padding2[62]; // * 4 = 248
+    uint32_t gameMode; // at 0x23c; menu/world map/encounter/loading/etc.(?)
+    // 4 + 248 + 324 = 576 = 144 * 4
+    uint32_t _padding3[11622]; // * 4 = 46488
     Critter* playerCritter; // at 0xb7d8
+    // 4 + 46488 + 576 = 47068 = 11767 * 4
 };
 
 /* String structure mimicking the one passed to DrawText. */
@@ -88,6 +91,12 @@ extern SetAction setAction;
 extern GetSmthPixel getSmthPixel;
 extern GetCritter getCritter;
 extern Global_DrawText global_drawText;
+
+/* Game modes. */
+extern uint32_t const IN_MENU;
+extern uint32_t const IN_ENCOUNTER;
+extern uint32_t const ON_WORLD_MAP;
+extern uint32_t const LOADING;
 
 /* Flags passed to drawText. */
 extern uint32_t const HALIGN_MIDDLE;
