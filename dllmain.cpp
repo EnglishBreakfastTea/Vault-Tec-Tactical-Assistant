@@ -4,6 +4,7 @@
 
 #include "FOClient.h"
 #include "mainLoop.h"
+#include "LeftMouseHook.h"
 
 /* ParseMouse call at 0x4a822c:
  * 8B CE                 - mov ecx,esi
@@ -43,17 +44,11 @@ __asm(
 /* We insert a call to our code (lMouseDown) before the call to GameLMouseDown.
  * The code may decide for the call to GameLMouseDown to not be performed. */
 
-bool lMouseDown(FOClient*)
-{
-    printf("lMouseDown\n");
-    return true;
-}
-
 DWORD lMouseDownInjAddress = 0x497f02;
 int lMouseDownInjNopCount = 0;
 extern "C" {
     /* Returns 1 if the GameLMouseDown call should be performed, 0 otherwise. */
-    DWORD _stdcall lMouseDownCWrapper(FOClient* client) { return lMouseDown(client); }
+    DWORD _stdcall lMouseDownCWrapper(FOClient* client) { return !lMouseDown(client); }
     void lMouseDownInjCode(void);
 }
 __asm(
