@@ -13,8 +13,6 @@ HexAttack::HexAttack(uint32_t critterId)
 
 bool HexAttack::frame(FOClient* client)
 {
-    printf("HexAttack frame\n");
-
     auto critter = getCritter(&client->hexManager, critterId);
 
     if (client->gameMode != IN_ENCOUNTER) {
@@ -42,6 +40,11 @@ LeftMouseHook HexAttackHook = [](FOClient* client)
 {
     if (client->mouseMode != MOUSE_ATTACK) {
         printf("HexAttackHook: not in attack mode\n");
+        return false;
+    }
+
+    if (client->playerCritter->hand->mode > 1) {
+        printf("HexAttackHook: not in non-aimed mode\n");
         return false;
     }
 
