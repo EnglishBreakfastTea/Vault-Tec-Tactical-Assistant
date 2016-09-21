@@ -76,17 +76,6 @@ zmienić na losowe stringi przed uruchomieniem, żeby multi-log:
 
 aimed attack w funkcji AimLMouseUp
 
-FOClient + 240: typ wybranej akcji (myszka)
-	3 = atak
-	1 = ruch
-	0 = zwykły wskaźnik
-	6 = rączka w inventory
-	4 = użycie skilla
-	5 pojawia się na chwilę zaraz po użyciu skilla?
-brakuje: use on (to samo co skill?), otwarta rączka (gdy np. ścinamy drzewo)
-
-FOClient + 244: poprzedni typ wybranej akcji?. Po co?
-
 argumenty przekazywane do SetAction na stosie, od lewej do prawej:
 1. typ akcji
 	1 = ACTION_MOVE
@@ -180,7 +169,6 @@ HexManager::GetCritter
 	jest jeszcze drugi wskaźnik w HexManager + 110, niby początek listy...
 	w algorytmie dzieją się dziwne rzeczy.
 
-
 FOClient:
 	w 0x20 HexManager
 	w 0x23c czy menu/WM/enco itd.
@@ -188,6 +176,15 @@ FOClient:
 		enco = 5
 		WM = 6
 		ładowanie = 7
+	0x240 tryb myszki
+		0 = zwykły wskaźnik
+		1 = ruch
+		2 = use on
+		3 = atak
+		4 = użycie skilla
+		5 = oczekiwanie (zegarek)
+		6 = rączka w inventory
+	0x244 poprzedni tryb myszki?
 	w 0xb7d8 Critter* gracza (a może to jest w HexManager?)
 	
 HexManager:

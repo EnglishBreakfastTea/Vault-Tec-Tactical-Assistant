@@ -19,6 +19,8 @@
  *
  * Every hook has a name, which uniquely identifies it. Installing a hook whose name is already used by another hook
  * removes the old hook.
+ *
+ * Hooks are executed only inside encounters (cities and other maps qualify, but World Map doesn't).
  */
 
 using LeftMouseHook = std::function<bool(FOClient*)>;
@@ -28,6 +30,9 @@ void installHook(std::string name, LeftMouseHook);
 
 /* Remove a hook. Does nothing if there was no hook with the given name. */
 void removeHook(std::string name);
+
+/* Checks if a hook with the given name is installed. */
+bool hookInstalled(std::string name);
 
 /* Call the installed hooks. If no hook is executed, returns false, indicating that the normal game code for left mouse
  * click should be performed. Otherwise returns true. */

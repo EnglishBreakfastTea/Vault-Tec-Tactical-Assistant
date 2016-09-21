@@ -2,6 +2,7 @@
 #define _HEXATTACK_H
 
 #include "ComplexAction.h"
+#include "LeftMouseHook.h"
 
 /* Run to the specified critter and attack it when the distance is 1 hex. */
 
@@ -13,5 +14,7 @@ public:
 private:
     uint32_t critterId;
 };
+
+extern LeftMouseHook HexAttackHook;
 
 #endif //_HEXATTACK_H

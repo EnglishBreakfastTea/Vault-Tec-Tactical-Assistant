@@ -5,6 +5,7 @@
 #include "FOClient.h"
 #include "mainLoop.h"
 #include "LeftMouseHook.h"
+#include "InterfaceOverlay.h"
 
 /* ParseMouse call at 0x4a822c:
  * 8B CE                 - mov ecx,esi
@@ -90,13 +91,6 @@ __asm(
  */
 
 /* We insert a call to our code (drawIface) before the call to RunPrepared. */
-
-void drawIface(FOClient* client)
-{
-    if (client->gameMode == IN_ENCOUNTER) {
-        drawString("VTTA", 100, 100, 100, 100, GREEN, NORMAL, BORDER);
-    }
-}
 
 DWORD drawIfaceInjAddress = 0x468ec2;
 int drawIfaceInjNopCount = 0;

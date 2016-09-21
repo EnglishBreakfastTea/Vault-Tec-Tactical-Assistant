@@ -57,10 +57,11 @@ struct FOClient {
     // 292 + 32 = 324 = 81 * 4
     uint32_t _padding2[62]; // * 4 = 248
     uint32_t gameMode; // at 0x23c; menu/world map/encounter/loading/etc.(?)
-    // 4 + 248 + 324 = 576 = 144 * 4
-    uint32_t _padding3[11622]; // * 4 = 46488
+    uint32_t mouseMode; // at 0x240; click/move/attack/use on etc.
+    // 4 + 4 + 248 + 324 = 580 = 145 * 4
+    uint32_t _padding3[11621]; // * 4 = 46484
     Critter* playerCritter; // at 0xb7d8
-    // 4 + 46488 + 576 = 47068 = 11767 * 4
+    // 4 + 46484 + 580 = 47068 = 11767 * 4
 };
 
 /* String structure mimicking the one passed to DrawText. */
@@ -98,6 +99,15 @@ extern uint32_t const IN_ENCOUNTER;
 extern uint32_t const ON_WORLD_MAP;
 extern uint32_t const LOADING;
 
+/* Mouse modes. */
+extern uint32_t const MOUSE_POINT;
+extern uint32_t const MOUSE_MOVE;
+extern uint32_t const MOUSE_USE_ON;
+extern uint32_t const MOUSE_ATTACK;
+extern uint32_t const MOUSE_SKILL;
+extern uint32_t const MOUSE_WAIT;
+extern uint32_t const MOUSE_INVENTORY;
+
 /* Flags passed to drawText. */
 extern uint32_t const HALIGN_MIDDLE;
 extern uint32_t const VALIGN_MIDDLE;
@@ -113,7 +123,7 @@ extern uint32_t const GRAY;
 /* Common fonts passed to drawText. */
 extern uint32_t const NORMAL; // Don't know how to call it.
 
-/* Constant in-game addresses. */
+/* Constant in-game pointers. */
 extern uint32_t* const mouseX;
 extern uint32_t* const mouseY;
 

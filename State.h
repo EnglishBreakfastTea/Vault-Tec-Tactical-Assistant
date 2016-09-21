@@ -9,7 +9,7 @@
 #include "messageQueue.h"
 #include "ComplexAction.h"
 
-/* Global state shared between various hooks. */
+/* Global state shared between different injected code fragments. */
 
 class State {
 public:

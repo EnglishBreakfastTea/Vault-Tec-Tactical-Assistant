@@ -4,7 +4,7 @@ project(VaultTecTacticalAssistant)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14 -masm=intel -static-libgcc -static-libstdc++")
 
 set(DLL_SOURCE_FILES dllmain.cpp mainLoop.cpp mainLoop.h FOClient.h messageQueue.h State.h State.cpp ComplexAction.h
-        HexAttack.cpp HexAttack.h FOClient.cpp LeftMouseHook.h LeftMouseHook.cpp)
+        HexAttack.cpp HexAttack.h FOClient.cpp LeftMouseHook.h LeftMouseHook.cpp InterfaceOverlay.cpp InterfaceOverlay.h)
 set(UI_SOURCE_FILES uiMain.cpp messageQueue.h)
 set(INJECTOR_SOURCE_FILES main.cpp)
 

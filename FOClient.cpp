@@ -116,6 +116,14 @@ uint32_t const IN_ENCOUNTER = 5;
 uint32_t const ON_WORLD_MAP = 6;
 uint32_t const LOADING = 7;
 
+uint32_t const MOUSE_POINT = 0;
+uint32_t const MOUSE_MOVE = 1;
+uint32_t const MOUSE_USE_ON = 2;
+uint32_t const MOUSE_ATTACK = 3;
+uint32_t const MOUSE_SKILL = 4;
+uint32_t const MOUSE_WAIT = 5;
+uint32_t const MOUSE_INVENTORY = 6;
+
 uint32_t const HALIGN_MIDDLE = 4;
 uint32_t const VALIGN_MIDDLE = 8;
 uint32_t const HALIGN_RIGHT = 16;

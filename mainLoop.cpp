@@ -6,8 +6,6 @@
 
 void mainLoop(FOClient* client)
 {
-    auto static state = std::unique_ptr<State>();
-
     if (!state) {
         setup(state);
 
@@ -85,6 +83,20 @@ void mainLoop(FOClient* client)
             }
 
             state->complexAction = std::make_unique<HexAttack>(critter->critterId);
+
+            return;
+        }
+    }
+
+    {
+        if (*msg == "toggle 1hex") {
+            auto name = "1hex";
+
+            if (hookInstalled(name)) {
+                removeHook(name);
+            } else {
+                installHook(name, HexAttackHook);
+            }
 
             return;
         }

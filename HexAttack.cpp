@@ -3,6 +3,7 @@
 #include "FOClient.h"
 
 #include "HexAttack.h"
+#include "State.h"
 
 HexAttack::HexAttack(uint32_t critterId)
     : critterId(critterId)
@@ -12,6 +13,8 @@ HexAttack::HexAttack(uint32_t critterId)
 
 bool HexAttack::frame(FOClient* client)
 {
+    printf("HexAttack frame\n");
+
     auto critter = getCritter(&client->hexManager, critterId);
 
     if (client->gameMode != IN_ENCOUNTER) {
@@ -34,3 +37,21 @@ bool HexAttack::frame(FOClient* client)
 
     return false;
 }
+
+LeftMouseHook HexAttackHook = [](FOClient* client)
+{
+    if (client->mouseMode != MOUSE_ATTACK) {
+        printf("HexAttackHook: not in attack mode\n");
+        return false;
+    }
+
+    auto critter = client->hexManager.critterUnderMouse();
+    if (!critter) {
+        printf("HexAttackHook: no critter under mouse\n");
+        return false;
+    }
+
+    state->complexAction = std::make_unique<HexAttack>(critter->critterId);
+
+    return true;
+};
