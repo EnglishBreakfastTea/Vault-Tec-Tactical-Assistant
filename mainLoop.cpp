@@ -2,14 +2,14 @@
 
 #include "State.h"
 #include "HexAttack.h"
+#include "Hotkeys.h"
 #include "mainLoop.h"
 
 void mainLoop(FOClient* client)
 {
     if (!state) {
         setup(state);
-
-        printf("\nFOClient address: %d\n", reinterpret_cast<uint32_t>(client));
+        installHotkeyHook({1, 1, 0, 'V'}, [](FOClient*) { printf("VTTA\n"); });
     }
 
     auto msg = state->getMessage();
@@ -92,10 +92,10 @@ void mainLoop(FOClient* client)
         if (*msg == "toggle 1hex") {
             auto name = "1hex";
 
-            if (hookInstalled(name)) {
-                removeHook(name);
+            if (mouseHookInstalled(name)) {
+                removeMouseHook(name);
             } else {
-                installHook(name, HexAttackHook);
+                installMouseHook(name, HexAttackHook);
             }
 
             return;

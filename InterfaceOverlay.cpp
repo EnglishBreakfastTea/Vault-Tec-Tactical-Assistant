@@ -7,7 +7,7 @@ void drawIface(FOClient* client)
         return;
     }
 
-    if (hookInstalled("1hex")) {
+    if (mouseHookInstalled("1hex")) {
         drawString("Hexbot enabled, you cheating cuck", 10, 50, 130, 30, GREEN, NORMAL, BORDER);
     }
 }

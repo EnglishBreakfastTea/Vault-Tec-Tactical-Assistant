@@ -1,12 +1,12 @@
 #include <cstdio>
 #include <windows.h>
 #include <fcntl.h>
-#include <algorithm>
 
 #include "FOClient.h"
 #include "mainLoop.h"
 #include "LeftMouseHook.h"
 #include "InterfaceOverlay.h"
+#include "Hotkeys.h"
 
 /* ParseMouse call at 0x4a822c:
  * 8B CE                 - mov ecx,esi
@@ -120,41 +120,11 @@ __asm(
  * We insert a call to our code (parseKeyboard) before the call to ParseKeyboard.
  * The code may decide for the call to ParseKeyboard to not be performed. */
 
-bool parseKeyboard(FOClient*)
-{
-    auto static numKeys = 256;
-    std::array<bool, 256> static lastKeysDown = {0};
-
-    if (!mainWindow()->windowActive) {
-        return true;
-    }
-
-    std::array<bool, 256> keysDown;
-    for (auto i = 0; i < 256; ++i) {
-        keysDown[i] = GetAsyncKeyState(i) & (1 << 16);
-    }
-
-    // Keys that were pressed just now.
-    std::array<bool, 256> keysPressed;
-    std::transform(std::begin(keysDown), std::end(keysDown), std::begin(lastKeysDown),
-                   std::begin(keysPressed), [](auto newState, auto oldState) { return newState && !oldState; });
-
-    std::copy(std::begin(keysDown), std::end(keysDown), std::begin(lastKeysDown));
-
-    for (auto i = 0; i < 256; ++i) {
-        if (keysPressed[i]) {
-            printf("keypress: %d\n", i);
-        }
-    }
-
-    return true;
-}
-
 DWORD parseKeyboardInjAddress = 0x004A8225;
 int parseKeyboardInjNopCount = 0;
 extern "C" {
-    /* Returns 1 if the GameLMouseDown call should be performed, 0 otherwise. */
-    DWORD _stdcall parseKeyboardCWrapper(FOClient* client) { return parseKeyboard(client); }
+    /* Returns 1 if the ParseKeyboard call should be performed, 0 otherwise. */
+    DWORD _stdcall parseKeyboardCWrapper(FOClient* client) { return !parseKeyboard(client); }
     void parseKeyboardInjCode(void);
 }
 __asm(

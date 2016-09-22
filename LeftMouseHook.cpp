@@ -5,17 +5,17 @@
 
 std::map<std::string, LeftMouseHook> hooks;
 
-void installHook(std::string name, LeftMouseHook hook)
+void installMouseHook(std::string name, LeftMouseHook hook)
 {
     hooks[name] = hook;
 }
 
-void removeHook(std::string name)
+void removeMouseHook(std::string name)
 {
     hooks.erase(name);
 }
 
-bool hookInstalled(std::string name)
+bool mouseHookInstalled(std::string name)
 {
     return hooks.find(name) != std::end(hooks);
 }

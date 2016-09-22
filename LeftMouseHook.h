@@ -26,13 +26,13 @@
 using LeftMouseHook = std::function<bool(FOClient*)>;
 
 /* Install a hook. If there was a hook with the given name installed, it will be removed. */
-void installHook(std::string name, LeftMouseHook);
+void installMouseHook(std::string name, LeftMouseHook);
 
 /* Remove a hook. Does nothing if there was no hook with the given name. */
-void removeHook(std::string name);
+void removeMouseHook(std::string name);
 
 /* Checks if a hook with the given name is installed. */
-bool hookInstalled(std::string name);
+bool mouseHookInstalled(std::string name);
 
 /* Call the installed hooks. If no hook is executed, returns false, indicating that the normal game code for left mouse
  * click should be performed. Otherwise returns true. */
