@@ -38,7 +38,7 @@ struct HexManager {
     Critter* critterUnderMouse();
 
     /* Check if the distance between the player and the given critter is <= 1 hex (can be 0 if critter = player). */
-    bool playerNear(Critter*);
+    bool playerNear(Critter const*);
 
     uint32_t _padding[72];
     uint32_t playerCritterId; // could be inside FOClient
@@ -77,7 +77,7 @@ struct DrawTextString {
 };
 
 /* Check if the distance between two critters is 1 hex. */
-bool crittersNeighbours(Critter*, Critter*);
+bool crittersNeighbours(Critter const*, Critter const*);
 
 /* Wrapper for Global_DrawText using std::string for passing the text and ignoring the return value. */
 void drawString(std::string, uint32_t x, uint32_t y, uint32_t width, uint32_t height,

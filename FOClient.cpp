@@ -55,7 +55,7 @@ Critter* HexManager::critterUnderMouse()
     return critter;
 }
 
-bool crittersNeighbours(Critter* critter1, Critter* critter2)
+bool crittersNeighbours(Critter const* critter1, Critter const* critter2)
 {
     assert(critter1);
     assert(critter2);
@@ -79,7 +79,7 @@ bool crittersNeighbours(Critter* critter1, Critter* critter2)
     });
 }
 
-bool HexManager::playerNear(Critter* critter)
+bool HexManager::playerNear(Critter const* critter)
 {
     assert(critter);
 
