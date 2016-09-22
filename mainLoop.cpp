@@ -1,9 +1,23 @@
 #include <cstdio>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/fusion/adapted/std_tuple.hpp>
+#include <boost/fusion/adapted/std_pair.hpp>
 
 #include "State.h"
 #include "HexAttack.h"
 #include "Hotkeys.h"
 #include "mainLoop.h"
+
+void toggle1hex()
+{
+    auto name = "1hex";
+
+    if (mouseHookInstalled(name)) {
+        removeMouseHook(name);
+    } else {
+        installMouseHook(name, HexAttackHook);
+    }
+}
 
 void mainLoop(FOClient* client)
 {
@@ -90,12 +104,35 @@ void mainLoop(FOClient* client)
 
     {
         if (*msg == "toggle 1hex") {
-            auto name = "1hex";
+            toggle1hex();
 
-            if (mouseHookInstalled(name)) {
-                removeMouseHook(name);
-            } else {
-                installMouseHook(name, HexAttackHook);
+            return;
+        }
+    }
+
+    {
+        using namespace boost::spirit;
+        using qi::ascii::char_;
+        using qi::ascii::space_type;
+        using qi::ascii::space;
+        using result_t = std::pair<std::pair<std::tuple<bool, bool, bool>, char>, std::string>;
+
+        auto it = std::begin(*msg);
+        auto end = std::end(*msg);
+        result_t result;
+        qi::rule<std::string::iterator, result_t, space_type> rule =
+            "bind" >> lexeme[-(char_('c') ^ char_('a') ^ char_('s')) >> '_' >> char_]
+                   >> lexeme['"' >> +(char_ - '"') >> '"'];
+
+        qi::phrase_parse(it, end, rule, space, result);
+        if (it == end) {
+            bool ctrl, alt, shift;
+            std::tie(ctrl, alt, shift) = result.first.first;
+            auto ch = result.first.second;
+            auto command = result.second;
+
+            if (command == "toggle 1hex") {
+                installHotkeyHook({ctrl, alt, shift, ch}, [](FOClient*) { toggle1hex(); });
             }
 
             return;

@@ -3,7 +3,7 @@
 
 void drawIface(FOClient* client)
 {
-    if (!client->gameMode == IN_ENCOUNTER) {
+    if (client->gameMode != IN_ENCOUNTER) {
         return;
     }
 

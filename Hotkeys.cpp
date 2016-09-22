@@ -1,12 +1,13 @@
 #include <windows.h>
 #include <cstdio>
+#include <cctype>
 #include <algorithm>
 #include <map>
 
 #include "Hotkeys.h"
 
 Hotkey::Hotkey(bool ctrl, bool alt, bool shift, char ch)
-    : hotkey(ch | ctrl << 8 | alt << 9 | shift << 10)
+    : hotkey(std::toupper(ch) | ctrl << 8 | alt << 9 | shift << 10)
 {
 }
 

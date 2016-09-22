@@ -16,7 +16,7 @@ public:
     State();
     ~State();
 
-    /* Retrieves a message from the UI if there is one. */
+    /* Retrieves a message from the UI or from ourself if there is one. */
     std::experimental::optional<std::string> getMessage();
 
     /* The currently performed complexAction or nullptr if there is none. */
