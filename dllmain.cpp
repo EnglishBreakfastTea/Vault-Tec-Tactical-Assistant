@@ -7,6 +7,7 @@
 #include "LeftMouseHook.h"
 #include "InterfaceOverlay.h"
 #include "Hotkeys.h"
+#include "State.h"
 
 /* ParseMouse call at 0x4a822c:
  * 8B CE                 - mov ecx,esi
@@ -226,5 +227,9 @@ BOOL APIENTRY DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
         cave(lMouseDownInjAddress, lMouseDownInjCode, lMouseDownInjNopCount);
         cave(drawIfaceInjAddress, drawIfaceInjCode, drawIfaceInjNopCount);
         cave(parseKeyboardInjAddress, parseKeyboardInjCode, parseKeyboardInjNopCount);
+    }
+
+    if (reason == DLL_PROCESS_DETACH) {
+        state = nullptr;
     }
 }
