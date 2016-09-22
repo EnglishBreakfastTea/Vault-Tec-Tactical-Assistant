@@ -94,6 +94,13 @@ void drawString(std::string str, uint32_t x, uint32_t y, uint32_t width, uint32_
     global_drawText(&_str, x, y, width, height, color, font, flags);
 }
 
+FOWindow* mainWindow()
+{
+    uint32_t constexpr MainWindowPtrAddr = 0x02F79A24;
+    auto ptr = reinterpret_cast<FOWindow**>(MainWindowPtrAddr);
+    return *ptr;
+}
+
 uint32_t constexpr FastTickAddr = 0x00538940;
 uint32_t constexpr IsActionAddr = 0x00472110;
 uint32_t constexpr SetActionAddr = 0x0048DDE0;

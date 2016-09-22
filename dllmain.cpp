@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <windows.h>
 #include <fcntl.h>
+#include <algorithm>
 
 #include "FOClient.h"
 #include "mainLoop.h"
@@ -10,9 +11,8 @@
 /* ParseMouse call at 0x4a822c:
  * 8B CE                 - mov ecx,esi
  * E8 7FF0FEFF           - call "FOnline 2.FOClient::ParseMouse" = 0x004972B0
- */
-
-/* We insert a call to our code (mainLoop) before the call to ParseMouse. */
+ *
+ * We insert a call to our code (mainLoop) before the call to ParseMouse. */
 
 DWORD mainLoopInjAddress = 0x004A822C;
 int mainLoopInjNopCount = 0;
@@ -40,9 +40,8 @@ __asm(
 /* GameLMouseDown call at 0x497f02:
  * 8B CE                 - mov ecx,esi
  * E8 C9DE0300           - call "FOnline 2.FOClient::GameLMouseDown" = 0x004D5DD0
- */
-
-/* We insert a call to our code (lMouseDown) before the call to GameLMouseDown.
+ *
+ * We insert a call to our code (lMouseDown) before the call to GameLMouseDown.
  * The code may decide for the call to GameLMouseDown to not be performed. */
 
 DWORD lMouseDownInjAddress = 0x497f02;
@@ -88,9 +87,8 @@ __asm(
  * E8 01FA0A00           - call "FOnline 2.Script::SetArgUInt"
  * 83 C4 04              - add esp,04
  * E8 192B0B00           - call "FOnline 2.Script::RunPrepared" = 0x0051B9E0
- */
-
-/* We insert a call to our code (drawIface) before the call to RunPrepared. */
+ *
+ * We insert a call to our code (drawIface) before the call to RunPrepared. */
 
 DWORD drawIfaceInjAddress = 0x468ec2;
 int drawIfaceInjNopCount = 0;
@@ -112,6 +110,81 @@ __asm(
 "mov eax, 0x0051B9E0;"
 "call eax;"
 "pop eax;"
+"ret;"
+);
+
+/* ParseKeyboard call at 0x004A8225:
+ * 8B CE                 - mov ecx,esi
+ * E8 E6E2FEFF           - call "FOnline 2.FOClient::ParseKeyboard" = 0x00496510
+ *
+ * We insert a call to our code (parseKeyboard) before the call to ParseKeyboard.
+ * The code may decide for the call to ParseKeyboard to not be performed. */
+
+bool parseKeyboard(FOClient*)
+{
+    auto static numKeys = 256;
+    std::array<bool, 256> static lastKeysDown = {0};
+
+    if (!mainWindow()->windowActive) {
+        return true;
+    }
+
+    std::array<bool, 256> keysDown;
+    for (auto i = 0; i < 256; ++i) {
+        keysDown[i] = GetAsyncKeyState(i) & (1 << 16);
+    }
+
+    // Keys that were pressed just now.
+    std::array<bool, 256> keysPressed;
+    std::transform(std::begin(keysDown), std::end(keysDown), std::begin(lastKeysDown),
+                   std::begin(keysPressed), [](auto newState, auto oldState) { return newState && !oldState; });
+
+    std::copy(std::begin(keysDown), std::end(keysDown), std::begin(lastKeysDown));
+
+    for (auto i = 0; i < 256; ++i) {
+        if (keysPressed[i]) {
+            printf("keypress: %d\n", i);
+        }
+    }
+
+    return true;
+}
+
+DWORD parseKeyboardInjAddress = 0x004A8225;
+int parseKeyboardInjNopCount = 0;
+extern "C" {
+    /* Returns 1 if the GameLMouseDown call should be performed, 0 otherwise. */
+    DWORD _stdcall parseKeyboardCWrapper(FOClient* client) { return parseKeyboard(client); }
+    void parseKeyboardInjCode(void);
+}
+__asm(
+".globl _parseKeyboardInjCode\n"
+"_parseKeyboardInjCode:\n"
+"push ebp;"
+"mov ebp, esp;"
+"sub esp, 4;"
+"pushad;"
+"pushfd;"
+"push ecx;" // FOClient*
+"call _parseKeyboardCWrapper@4;"
+"mov [ebp-4], eax;" // get the returned value
+"popfd;"
+"popad;"
+
+"push eax;"
+"mov eax, [ebp-4];"
+"cmp eax, 0;"
+"pop eax;"
+"je vtta_pk_end;"
+
+"push eax;"
+"mov eax, 0x00496510;"
+"call eax;"
+"pop eax;"
+
+"vtta_pk_end:"
+"mov esp, ebp;"
+"pop ebp;"
 "ret;"
 );
 
@@ -182,5 +255,6 @@ BOOL APIENTRY DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
         cave(mainLoopInjAddress, mainLoopInjCode, mainLoopInjNopCount);
         cave(lMouseDownInjAddress, lMouseDownInjCode, lMouseDownInjNopCount);
         cave(drawIfaceInjAddress, drawIfaceInjCode, drawIfaceInjNopCount);
+        cave(parseKeyboardInjAddress, parseKeyboardInjCode, parseKeyboardInjNopCount);
     }
 }

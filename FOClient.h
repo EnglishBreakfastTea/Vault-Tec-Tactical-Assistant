@@ -64,6 +64,12 @@ struct FOClient {
     // 4 + 46484 + 580 = 47068 = 11767 * 4
 };
 
+struct FOWindow {
+    uint32_t _padding[41]; // * 4 = 164
+    uint32_t windowActive; // at 0xa4
+    // 4 + 164 = 168 = 4 * 42
+};
+
 /* String structure mimicking the one passed to DrawText. */
 struct DrawTextString {
     uint32_t _padding[6];
@@ -76,6 +82,9 @@ bool crittersNeighbours(Critter*, Critter*);
 /* Wrapper for Global_DrawText using std::string for passing the text and ignoring the return value. */
 void drawString(std::string, uint32_t x, uint32_t y, uint32_t width, uint32_t height,
                 uint32_t color, uint32_t font, uint32_t flags);
+
+/* Functions for accessing global structures. */
+extern FOWindow* mainWindow();
 
 /* In-game functions. */
 using FastTick = uint32_t (_stdcall *)();
