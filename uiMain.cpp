@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <fstream>
 #include <boost/interprocess/ipc/message_queue.hpp>
 
 #include "messageQueue.h"
@@ -17,6 +18,22 @@ int main()
         std::cout << "Press any key..." << std::endl;
         std::getchar();
         return 0;
+    }
+
+    {
+        std::ifstream initFile("vttainit.ini");
+        if (initFile.good()) {
+            std::string msg;
+            while (std::getline(initFile, msg)) {
+                std::cout << msg << std::endl;
+
+                if (msg == "quit") {
+                    return 0;
+                }
+
+                mq->send(msg.data(), msg.size(), 0);
+            }
+        }
     }
 
     std::string msg;
