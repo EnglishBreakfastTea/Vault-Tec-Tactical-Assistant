@@ -9,9 +9,9 @@
 #include "Hotkeys.h"
 #include "State.h"
 
-/* ParseMouse call at 0x4a822c:
+/* ParseMouse call:
  * 8B CE                 - mov ecx,esi
- * E8 7FF0FEFF           - call "FOnline 2.FOClient::ParseMouse" = 0x004972B0
+ * E8 7FF0FEFF           - call "FOnline 2.FOClient::ParseMouse"
  *
  * We insert a call to our code (mainLoop) before the call to ParseMouse. */
 
@@ -32,15 +32,15 @@ __asm(
 "popad;"
 
 "push eax;"
-"mov eax, 0x004972B0;"
+"mov eax, 0x004972B0;" // FOClient::ParseMouse
 "call eax;"
 "pop eax;"
 "ret;"
 );
 
-/* GameLMouseDown call at 0x497f02:
+/* GameLMouseDown call:
  * 8B CE                 - mov ecx,esi
- * E8 C9DE0300           - call "FOnline 2.FOClient::GameLMouseDown" = 0x004D5DD0
+ * E8 C9DE0300           - call "FOnline 2.FOClient::GameLMouseDown"
  *
  * We insert a call to our code (lMouseDown) before the call to GameLMouseDown.
  * The code may decide for the call to GameLMouseDown to not be performed. */
@@ -73,7 +73,7 @@ __asm(
 "je vtta_lmd_end;"
 
 "push eax;"
-"mov eax, 0x004D5DD0;"
+"mov eax, 0x004D5DD0;" // FOClient::GameLMouseDown
 "call eax;"
 "pop eax;"
 
@@ -83,11 +83,11 @@ __asm(
 "ret;"
 );
 
-/* RunPrepared call at 0x468ec2:
+/* RunPrepared call:
  * C6 05 9CC38300 01     - mov byte ptr ["FOnline 2.FOClient::SpritesCanDraw"],01
  * E8 01FA0A00           - call "FOnline 2.Script::SetArgUInt"
  * 83 C4 04              - add esp,04
- * E8 192B0B00           - call "FOnline 2.Script::RunPrepared" = 0x0051B9E0
+ * E8 192B0B00           - call "FOnline 2.Script::RunPrepared"
  *
  * We insert a call to our code (drawIface) before the call to RunPrepared. */
 
@@ -108,15 +108,15 @@ __asm(
 "popad;"
 
 "push eax;"
-"mov eax, 0x0051B9E0;"
+"mov eax, 0x0051B9E0;" //Script::RunPrepared
 "call eax;"
 "pop eax;"
 "ret;"
 );
 
-/* ParseKeyboard call at 0x004A8225:
+/* ParseKeyboard call:
  * 8B CE                 - mov ecx,esi
- * E8 E6E2FEFF           - call "FOnline 2.FOClient::ParseKeyboard" = 0x00496510
+ * E8 E6E2FEFF           - call "FOnline 2.FOClient::ParseKeyboard"
  *
  * We insert a call to our code (parseKeyboard) before the call to ParseKeyboard.
  * The code may decide for the call to ParseKeyboard to not be performed. */
@@ -149,7 +149,7 @@ __asm(
 "je vtta_pk_end;"
 
 "push eax;"
-"mov eax, 0x00496510;"
+"mov eax, 0x00496510;" // FOClient::ParseKeyboard
 "call eax;"
 "pop eax;"
 
