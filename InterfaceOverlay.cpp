@@ -1,5 +1,6 @@
-#include "InterfaceOverlay.h"
 #include "LeftMouseHook.h"
+#include "BackgroundJob.h"
+#include "InterfaceOverlay.h"
 
 void drawIface(FOClient* client)
 {
@@ -8,6 +9,10 @@ void drawIface(FOClient* client)
     }
 
     if (mouseHookInstalled("1hex")) {
-        drawString("Hexbot enabled, you cheating cuck", 10, 50, 130, 30, GREEN, NORMAL, BORDER);
+        drawString("Hexbot enabled", 10, 50, 130, 30, GREEN, NORMAL, BORDER);
+    }
+
+    if (jobRunning("center")) {
+        drawString("Centering", 10, 60, 130, 30, GREEN, NORMAL, BORDER);
     }
 }

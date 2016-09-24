@@ -6,6 +6,7 @@
 #include "State.h"
 #include "HexAttack.h"
 #include "Hotkeys.h"
+#include "BackgroundJob.h"
 #include "mainLoop.h"
 
 void toggle1hex()
@@ -19,12 +20,31 @@ void toggle1hex()
     }
 }
 
+void toggleCenter()
+{
+    auto name = "center";
+    auto job = [](FOClient* client) {
+        if (client->gameMode != IN_ENCOUNTER) {
+            return;
+        }
+        client->center();
+    };
+
+    if (jobRunning(name)) {
+        stopJob(name);
+    } else {
+        startJob(name, job);
+    }
+}
+
 void mainLoop(FOClient* client)
 {
     if (!state) {
         setup(state);
         installHotkeyHook({1, 1, 0, 'V'}, [](FOClient*) { printf("VTTA\n"); });
     }
+
+    runJobs(client);
 
     auto msg = state->getMessage();
 
@@ -142,6 +162,10 @@ void mainLoop(FOClient* client)
 
             if (command == "toggle 1hex") {
                 installHotkeyHook(hotkey, [](FOClient*) { toggle1hex(); });
+            }
+
+            if (command == "toggle center") {
+                installHotkeyHook(hotkey, [](FOClient*) { toggleCenter(); });
             }
 
             if (command == "center") {
