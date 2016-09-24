@@ -229,6 +229,15 @@ HexManager::RebuildMap
 	_thiscall
 	pobiera 1. screenX, 2. screenY
 
+FOClient::ParseKeyboard
+	+96510
+	_thiscall
+	wykonuje następujący kod, żeby sprawdzić czy coś zostało wciśnięte:
+		mov ecx,[edx+a8]
+		cmp ecx,[edx+ac]
+		je ...
+	żeby oszukać grę, wystarczy przed wywołaniem ParseKeyboard przypisać [edx+ac]=[edxa8]
+
 FOClient:
 	w 0x20 HexManager
 	w 0x23c czy menu/WM/enco itd.

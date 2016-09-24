@@ -31,8 +31,8 @@ void installHotkeyHook(Hotkey, HotkeyHook);
 /* Remove a hook. Does nothing if there was no hook with the given hotkey. */
 void removeHotkeyHook(Hotkey, HotkeyHook);
 
-/* Check for pressed hotkeys and call the associated hooks. If no hook is executed, returns false,
- * indicating that the normal game code for keyboard handling should be performed. Otherwise returns true. */
-bool parseKeyboard(FOClient*);
+/* Check for pressed hotkeys and call the associated hooks. If no hook is executed, lets the game perform
+ * its normal check for hotkeys. Otherwise it modifies the game state as if nothing was pressed. */
+void parseKeyboard(FOClient*);
 
 #endif //_HOTKEYS_H

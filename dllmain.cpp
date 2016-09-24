@@ -118,44 +118,28 @@ __asm(
  * 8B CE                 - mov ecx,esi
  * E8 E6E2FEFF           - call "FOnline 2.FOClient::ParseKeyboard"
  *
- * We insert a call to our code (parseKeyboard) before the call to ParseKeyboard.
- * The code may decide for the call to ParseKeyboard to not be performed. */
+ * We insert a call to our code (parseKeyboard) before the call to ParseKeyboard. */
 
 DWORD parseKeyboardInjAddress = 0x004A8225;
 int parseKeyboardInjNopCount = 0;
 extern "C" {
-    /* Returns 1 if the ParseKeyboard call should be performed, 0 otherwise. */
-    DWORD _stdcall parseKeyboardCWrapper(FOClient* client) { return !parseKeyboard(client); }
+    void _stdcall parseKeyboardCWrapper(FOClient* client) { parseKeyboard(client); }
     void parseKeyboardInjCode(void);
 }
 __asm(
 ".globl _parseKeyboardInjCode\n"
 "_parseKeyboardInjCode:\n"
-"push ebp;"
-"mov ebp, esp;"
-"sub esp, 4;"
 "pushad;"
 "pushfd;"
 "push ecx;" // FOClient*
 "call _parseKeyboardCWrapper@4;"
-"mov [ebp-4], eax;" // get the returned value
 "popfd;"
 "popad;"
-
-"push eax;"
-"mov eax, [ebp-4];"
-"cmp eax, 0;"
-"pop eax;"
-"je vtta_pk_end;"
 
 "push eax;"
 "mov eax, 0x00496510;" // FOClient::ParseKeyboard
 "call eax;"
 "pop eax;"
-
-"vtta_pk_end:"
-"mov esp, ebp;"
-"pop ebp;"
 "ret;"
 );
 

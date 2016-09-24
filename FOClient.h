@@ -62,10 +62,14 @@ struct FOClient {
     Critter* playerCritter; // at 0xb7d8
 }; // size: 0xb7dc
 
+struct KeyboardState;
+
 struct FOWindow {
     uint32_t _padding[41];
     uint32_t windowActive; // at 0xa4
-}; // size: 0xa8
+    KeyboardState* keyboardState; // at 0xa8
+    KeyboardState* newKeyboardState; // at 0xac
+}; // size: 0xb0
 
 /* String structure mimicking the one passed to DrawText. */
 struct DrawTextString {

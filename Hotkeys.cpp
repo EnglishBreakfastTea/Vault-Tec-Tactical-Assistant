@@ -28,13 +28,13 @@ void removeHotkeyHook(Hotkey hotkey, HotkeyHook hook)
     hooks.erase(hotkey);
 }
 
-bool parseKeyboard(FOClient* client)
+void parseKeyboard(FOClient* client)
 {
     auto constexpr numKeys = 256;
     std::array<bool, numKeys> static lastKeysDown = {0};
 
     if (!mainWindow()->windowActive) {
-        return false;
+        return;
     }
 
     std::array<bool, numKeys> keysDown;
@@ -50,7 +50,7 @@ bool parseKeyboard(FOClient* client)
     std::copy(std::begin(keysDown), std::end(keysDown), std::begin(lastKeysDown));
 
     for (auto vk = 0; vk < numKeys; ++vk) {
-        if (!keysPressed[vk]) {
+        if (!keysPressed[vk] && !keysDown[vk]) {
             continue;
         }
 
@@ -67,10 +67,15 @@ bool parseKeyboard(FOClient* client)
             continue;
         }
 
-        it->second(client);
+        if (keysPressed[vk]) {
+            // If our hotkey was pressed just now, we execute the associated hook.
+            it->second(client);
+        }
 
-        return true;
+        // If our hotkey is down, we tell the game that nothing has changed with the keyboard state.
+        auto window = mainWindow();
+        window->newKeyboardState = window->keyboardState;
     }
 
-    return false;
+    return;
 }
