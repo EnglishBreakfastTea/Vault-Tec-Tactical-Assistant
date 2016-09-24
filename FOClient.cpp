@@ -42,6 +42,17 @@ void FOClient::attack(uint32_t critterId)
     setAction(this, ACTION_ATTACK, hand->handItemId, heldItem->itemId, 2, critterId, mode, 0);
 }
 
+void FOClient::center()
+{
+    if (hexManager.screenX == playerCritter->x && hexManager.screenY == playerCritter->y) {
+        return;
+    }
+
+    hexManager.screenX = playerCritter->x;
+    hexManager.screenY = playerCritter->y;
+    rebuildMap(&hexManager, hexManager.screenX, hexManager.screenY);
+}
+
 Critter* HexManager::critterUnderMouse()
 {
     Object* obj = nullptr;
@@ -107,6 +118,7 @@ uint32_t constexpr SetActionAddr = 0x0048DDE0;
 uint32_t constexpr GetSmthPixelAddr = 0x00504C40;
 uint32_t constexpr GetCritterAddr = 0x004800C0;
 uint32_t constexpr DrawTextAddr = 0x004763E0;
+uint32_t constexpr RebuildMapAddr = 0x00505F70;
 
 uint32_t constexpr MouseXAddr = 0x008520C4;
 uint32_t constexpr MouseYAddr = 0x008520C8;
@@ -117,6 +129,7 @@ SetAction setAction = reinterpret_cast<SetAction>(SetActionAddr);
 GetSmthPixel getSmthPixel = reinterpret_cast<GetSmthPixel>(GetSmthPixelAddr);
 GetCritter getCritter = reinterpret_cast<GetCritter>(GetCritterAddr);
 Global_DrawText global_drawText = reinterpret_cast<Global_DrawText>(DrawTextAddr);
+RebuildMap rebuildMap = reinterpret_cast<RebuildMap>(RebuildMapAddr);
 
 uint32_t const IN_MENU = 1;
 uint32_t const IN_ENCOUNTER = 5;

@@ -36,7 +36,10 @@ struct HexManager {
     /* Check if the distance between the player and the given critter is <= 1 hex (can be 0 if critter = player). */
     bool playerNear(Critter const*);
 
-    uint32_t _padding[72];
+    uint32_t _padding1[42];
+    uint32_t screenX; // at 0xa8
+    uint32_t screenY; // at 0xac
+    uint32_t _padding[28];
     uint32_t playerCritterId; // at 0x120; could be inside FOClient
 }; // size: 0x124
 
@@ -46,6 +49,9 @@ struct FOClient {
 
     /* Attack the given critter using the in-game attack mode (e.g. burst) */
     void attack(uint32_t critterId);
+
+    /* Center the view on the player. */
+    void center();
 
     uint32_t _padding1[8];
     HexManager hexManager; // at 0x20
@@ -85,6 +91,7 @@ using GetSmthPixel = void (_thiscall *)(HexManager*, uint32_t mouseX, uint32_t m
 using GetCritter = Critter* (_thiscall *)(HexManager*, uint32_t critterId);
 using Global_DrawText = uint32_t (_cdecl *)(DrawTextString*, uint32_t x, uint32_t y, uint32_t width, uint32_t height,
                                             uint32_t color, uint32_t font, uint32_t flags);
+using RebuildMap = void (_thiscall *)(HexManager*, uint32_t screenX, uint32_t screenY);
 
 extern FastTick fastTick;
 extern IsAction isAction;
@@ -92,6 +99,7 @@ extern SetAction setAction;
 extern GetSmthPixel getSmthPixel;
 extern GetCritter getCritter;
 extern Global_DrawText global_drawText;
+extern RebuildMap rebuildMap;
 
 /* Game modes. */
 extern uint32_t const IN_MENU;

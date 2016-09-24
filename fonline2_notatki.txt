@@ -221,6 +221,14 @@ FOClient::SScriptFunc::Global_DrawText
 			0 800 20 40 0xff00c800 524 5 "Hub and NCR..."
 			0 800 20 60 0xff00c800 524 5 "Convoy transport..."
 
+HexManager::Scroll
+	addr +106B60
+	_thiscall
+HexManager::RebuildMap
+	addr +105F70
+	_thiscall
+	pobiera 1. screenX, 2. screenY
+
 FOClient:
 	w 0x20 HexManager
 	w 0x23c czy menu/WM/enco itd.
@@ -240,6 +248,9 @@ FOClient:
 	w 0xb7d8 Critter* gracza (a może to jest w HexManager?)
 
 HexManager:
+	0xa8 screenX
+	0xac screenY
+		należy wywołać RebuildMap z tymi wartościami żeby odświeżyć widok
 	w 0x120 critterId gracza (może być to pamięć FOClient, ale raczej nie)
 
 ItemManager: co to jest?

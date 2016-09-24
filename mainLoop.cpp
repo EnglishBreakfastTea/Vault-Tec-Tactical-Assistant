@@ -111,6 +111,13 @@ void mainLoop(FOClient* client)
     }
 
     {
+        if (*msg == "center") {
+            client->center();
+            return;
+        }
+    }
+
+    {
         using namespace boost::spirit;
         using qi::ascii::char_;
         using qi::ascii::space_type;
@@ -129,10 +136,16 @@ void mainLoop(FOClient* client)
             bool ctrl, alt, shift;
             std::tie(ctrl, alt, shift) = result.first.first;
             auto ch = result.first.second;
+
+            auto hotkey = Hotkey{ctrl, alt, shift, ch};
             auto command = result.second;
 
             if (command == "toggle 1hex") {
-                installHotkeyHook({ctrl, alt, shift, ch}, [](FOClient*) { toggle1hex(); });
+                installHotkeyHook(hotkey, [](FOClient*) { toggle1hex(); });
+            }
+
+            if (command == "center") {
+                installHotkeyHook(hotkey, [](FOClient* client) { client->center(); });
             }
 
             return;
