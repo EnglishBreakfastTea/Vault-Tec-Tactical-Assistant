@@ -8,30 +8,26 @@
 
 struct Item {
     uint32_t itemId;
-};
+}; // size: 0x4
 
 struct Hand { // I don't know what this is, but it points to the held item, so I called it Hand.
     uint32_t handItemId; // Don't know how I should call it.
-    Item* heldItem;
-    // 4 * 2 = 8
-    uint32_t _padding[10]; // 40
-    // 8 + 40 = 48 = 4 * 12
+    Item* heldItem; // at 0x4
+    uint32_t _padding[10];
     uint8_t mode; // at 0x30
-};
+}; // size: 0x31
 
 struct Object; // from a Xander Root lying on the ground to a standing Wagon
 
 struct Critter {
     uint32_t critterId;
     uint16_t _padding1;
-    uint16_t x;
-    uint16_t y;
+    uint16_t x; // at 0x6
+    uint16_t y; // at 0x8
     uint16_t _padding2;
-    // 4 + 2 + 2 + 2 + 2 = 12 = 4 * 3
-    uint32_t _padding3[1064]; // 4256
-    // 4256 + 12 = 4268 = 4 * 1067
-    Hand* hand;
-};
+    uint32_t _padding3[1064];
+    Hand* hand; // at 0x10ac
+}; // size: 0x10b0
 
 struct HexManager {
     /* Returns the critter currently pointed by the mouse cursor or nullptr if there is none. */
@@ -41,9 +37,8 @@ struct HexManager {
     bool playerNear(Critter const*);
 
     uint32_t _padding[72];
-    uint32_t playerCritterId; // could be inside FOClient
-    // 73 * 4 = 292
-};
+    uint32_t playerCritterId; // at 0x120; could be inside FOClient
+}; // size: 0x124
 
 struct FOClient {
     /* Move the player to the given position. */
@@ -52,23 +47,19 @@ struct FOClient {
     /* Attack the given critter using the in-game attack mode (e.g. burst) */
     void attack(uint32_t critterId);
 
-    uint32_t _padding1[8]; // * 4 = 32
+    uint32_t _padding1[8];
     HexManager hexManager; // at 0x20
-    // 292 + 32 = 324 = 81 * 4
-    uint32_t _padding2[62]; // * 4 = 248
+    uint32_t _padding2[62];
     uint32_t gameMode; // at 0x23c; menu/world map/encounter/loading/etc.(?)
     uint32_t mouseMode; // at 0x240; click/move/attack/use on etc.
-    // 4 + 4 + 248 + 324 = 580 = 145 * 4
-    uint32_t _padding3[11621]; // * 4 = 46484
+    uint32_t _padding3[11621];
     Critter* playerCritter; // at 0xb7d8
-    // 4 + 46484 + 580 = 47068 = 11767 * 4
-};
+}; // size: 0xb7dc
 
 struct FOWindow {
-    uint32_t _padding[41]; // * 4 = 164
+    uint32_t _padding[41];
     uint32_t windowActive; // at 0xa4
-    // 4 + 164 = 168 = 4 * 42
-};
+}; // size: 0xa8
 
 /* String structure mimicking the one passed to DrawText. */
 struct DrawTextString {
