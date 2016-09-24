@@ -27,9 +27,9 @@ struct Critter {
     uint16_t x; // at 0x6
     uint16_t y; // at 0x8
     uint16_t _padding2;
-    uint32_t _padding3[1064];
-    Hand* hand; // at 0x10ac
-}; // size: 0x10b0
+    uint32_t _padding3[1065];
+    Hand* hand; // at 0x10b0
+}; // size: 0x10b4
 
 struct HexManager {
     /* Returns the critter currently pointed by the mouse cursor or nullptr if there is none. */
@@ -38,12 +38,14 @@ struct HexManager {
     /* Check if the distance between the player and the given critter is <= 1 hex (can be 0 if critter = player). */
     bool playerNear(Critter const*);
 
-    uint32_t _padding1[42];
-    uint32_t screenX; // at 0xa8
-    uint32_t screenY; // at 0xac
-    uint32_t _padding[28];
-    uint32_t playerCritterId; // at 0x120; could be inside FOClient
-}; // size: 0x124
+    uint32_t _padding1[34];
+    uint32_t screenX; // at 0x88
+    uint32_t screenY; // at 0x8c
+    uint32_t _padding2[28];
+    uint32_t playerCritterId; // at 0x100; could be inside FOClient
+}; // size: 0x104
+
+struct KeyboardState;
 
 struct FOClient {
     /* Move the player to the given position. */
@@ -58,20 +60,19 @@ struct FOClient {
     uint32_t _padding1[8];
     HexManager hexManager; // at 0x20
     uint32_t _padding2[62];
-    uint32_t gameMode; // at 0x23c; menu/world map/encounter/loading/etc.(?)
-    uint32_t mouseMode; // at 0x240; click/move/attack/use on etc.
-    uint32_t _padding3[11621];
-    Critter* playerCritter; // at 0xb7d8
-}; // size: 0xb7dc
-
-struct KeyboardState;
+    uint32_t gameMode; // at 0x21c; menu/world map/encounter/loading/etc.(?)
+    uint32_t mouseMode; // at 0x220; click/move/attack/use on etc.
+    uint32_t _padding3;
+    KeyboardState* keyboardState; // at 0x228
+    KeyboardState* newKeyboardState; // at 0x22C
+    uint32_t _padding4[6748];
+    Critter* playerCritter; // at 0x6ba0
+}; //size: 0x6ba4
 
 struct FOWindow {
     uint32_t _padding[41];
     uint32_t windowActive; // at 0xa4
-    KeyboardState* keyboardState; // at 0xa8
-    KeyboardState* newKeyboardState; // at 0xac
-}; // size: 0xb0
+}; // size: 0xa8
 
 /* String structure mimicking the one passed to DrawText. */
 struct DrawTextString {
