@@ -20,6 +20,78 @@ void toggle1hex()
     }
 }
 
+void toggle1hexv2()
+{
+    std::map<uint32_t, uint32_t> static patches;
+
+    auto getHeldItem = [](FOClient* client) -> Item* {
+        auto player = client->playerCritter;
+        if (!player) {
+            return nullptr;
+        }
+
+        auto hand = player->hand;
+        if (!hand) {
+            return nullptr;
+        }
+
+        auto heldItem = hand->heldItem;
+        if (!heldItem) {
+            return nullptr;
+        }
+
+        return heldItem;
+    };
+
+    auto HexPatchHook = [getHeldItem](FOClient* client) {
+        auto heldItem = getHeldItem(client);
+        if (!heldItem) {
+            return false;
+        }
+
+        auto rangeAddress = reinterpret_cast<uint32_t>(&heldItem->range);
+        if (patches.find(rangeAddress) != std::end(patches)) {
+            // Patch already installed.
+            return false;
+        }
+
+        // We patch the item's range, changing it to 1.
+        patches[rangeAddress] = heldItem->range;
+        heldItem->range = 1;
+
+        return false;
+    };
+
+    auto HexUnpatchHook = [getHeldItem](FOClient* client) {
+        auto heldItem = getHeldItem(client);
+        if (!heldItem) {
+            return false;
+        }
+
+        auto rangeAddress = reinterpret_cast<uint32_t>(&heldItem->range);
+        auto patch = patches.find(rangeAddress);
+        if (patch == std::end(patches)) {
+            // No patch applied.
+            return false;
+        }
+
+        // We remove the patch, changing the item's range to the original one.
+        heldItem->range = patch->second;
+        patches.erase(patch);
+        return false;
+    };
+
+    if (mouseHookInstalled("1hexpatch")) {
+        assert(!mouseHookInstalled("1hexunpatch"));
+
+        removeMouseHook("1hexpatch");
+        installMouseHook("1hexunpatch", HexUnpatchHook);
+    } else {
+        removeMouseHook("1hexunpatch");
+        installMouseHook("1hexpatch", HexPatchHook);
+    }
+}
+
 void toggleCenter()
 {
     auto name = "center";
@@ -170,6 +242,10 @@ void mainLoop(FOClient* client)
 
             if (command == "center") {
                 installHotkeyHook(hotkey, [](FOClient* client) { client->center(); });
+            }
+
+            if (command == "toggle 1hexv2") {
+                installHotkeyHook(hotkey, [](FOClient*) { toggle1hexv2(); });
             }
 
             return;

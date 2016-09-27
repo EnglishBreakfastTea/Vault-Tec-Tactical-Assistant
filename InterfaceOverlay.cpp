@@ -12,7 +12,11 @@ void drawIface(FOClient* client)
         drawString("Hexbot enabled", 10, 50, 130, 30, GREEN, NORMAL, BORDER);
     }
 
+    if (mouseHookInstalled("1hexpatch")) {
+        drawString("Hexbot v2 enabled", 10, 50, 130, 30, GREEN, NORMAL, BORDER);
+    }
+
     if (jobRunning("center")) {
-        drawString("Centering", 10, 60, 130, 30, GREEN, NORMAL, BORDER);
+        drawString("Centering", 10, 70, 130, 30, GREEN, NORMAL, BORDER);
     }
 }

@@ -7,6 +7,7 @@
 
 /* LeftMouseHook is a function which, if enabled, will be called on a left mouse click.
  *
+ * TODO: change description, hooks may execute and return false.
  * The return value indicates if the hook executed, e.g. a hook may execute only when clicking on a critter
  * in attack mode. In that situation, the hook returns true. Otherwise it returns false.
  *
