@@ -46,6 +46,8 @@ ważne funkcje:
 				jeśli ruch, to czas
 				jeśli skill, to zawsze 0?
 				jeśli atak, to zawsze 0
+		jest jeszcze druga wersja SetAction, która przyjmuje kolejne 3 argumenty (?) przez referencję (?)
+		to SetAction wywołuje drugą wersję, przekazując referencje i ignorując to, co wewnętrzne SetAction w nich zapisało.
 		
 	FOClient::GameLMouseDown
 		_thiscall
@@ -302,7 +304,6 @@ adresy i offsety:
 	Reloaded FOnline.exe:
 		AddActionBack +75840
 		AddAction +75920
-		SetAction +78C60
 		SetAction +7BB40
 		GameLMouseDown +C2450
 		ParseMouse +84190
@@ -332,6 +333,8 @@ adresy i offsety:
 			hexManager 0x20
 			gameMode 0x21c
 			mouseMode 0x220
+			keyboardState 0x228
+			newKeyboardState 0x22c
 			playerCritter 0x6ba0
 		FOWindow
 			windowActive 0xa4
@@ -354,7 +357,6 @@ adresy i offsety:
 	Reloaded FOnlineGL.exe:
 		AddAction +76DF0
 		AddActionBack +76ED0
-		SetAction +7A300
 		SetAction +7D250
 		GameLMouseDown +C4C80
 		FastTick +128110
@@ -383,6 +385,8 @@ adresy i offsety:
 			hexManager 0x20
 			gameMode 0x23C
 			mouseMode 0x240
+			keyboardState 0x248
+			newKeyboardState 0x24c
 			playerCritter 0x6c08
 		FOWindow
 			windowActive 0xa4
@@ -405,7 +409,7 @@ adresy i offsety:
 	FOnline 2.exe:
 		AddAction +878D0
 		AddActioBack +879B1
-		SetAction +8ADA0
+		SetAction +8DDE0
 		GameLMouseDown +D5DD0
 		ParseMouse +972B0
 		ParseKeyboard +96510
