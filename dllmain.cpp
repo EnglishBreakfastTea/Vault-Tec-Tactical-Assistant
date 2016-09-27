@@ -9,11 +9,7 @@
 #include "Hotkeys.h"
 #include "State.h"
 
-/* ParseMouse call:
- * 8B CE                 - mov ecx,esi
- * E8 7FF0FEFF           - call "FOnline 2.FOClient::ParseMouse"
- *
- * We insert a call to our code (mainLoop) before the call to ParseMouse. */
+/* We insert a call to our code (mainLoop) before the call to ParseMouse in MainLoop. */
 
 DWORD mainLoopInjAddress = 0x004A822C;
 int mainLoopInjNopCount = 0;
@@ -38,11 +34,7 @@ __asm(
 "ret;"
 );
 
-/* GameLMouseDown call:
- * 8B CE                 - mov ecx,esi
- * E8 C9DE0300           - call "FOnline 2.FOClient::GameLMouseDown"
- *
- * We insert a call to our code (lMouseDown) before the call to GameLMouseDown.
+/* We insert a call to our code (lMouseDown) before the call to GameLMouseDown in ParseMouse.
  * The code may decide for the call to GameLMouseDown to not be performed. */
 
 DWORD lMouseDownInjAddress = 0x497f02;
@@ -83,13 +75,7 @@ __asm(
 "ret;"
 );
 
-/* RunPrepared call:
- * C6 05 9CC38300 01     - mov byte ptr ["FOnline 2.FOClient::SpritesCanDraw"],01
- * E8 01FA0A00           - call "FOnline 2.Script::SetArgUInt"
- * 83 C4 04              - add esp,04
- * E8 192B0B00           - call "FOnline 2.Script::RunPrepared"
- *
- * We insert a call to our code (drawIface) before the call to RunPrepared. */
+/* We insert a call to our code (drawIface) before the call to RunPrepared in DrawIfaceLayer. */
 
 DWORD drawIfaceInjAddress = 0x468ec2;
 int drawIfaceInjNopCount = 0;
@@ -114,11 +100,7 @@ __asm(
 "ret;"
 );
 
-/* ParseKeyboard call:
- * 8B CE                 - mov ecx,esi
- * E8 E6E2FEFF           - call "FOnline 2.FOClient::ParseKeyboard"
- *
- * We insert a call to our code (parseKeyboard) before the call to ParseKeyboard. */
+/* We insert a call to our code (parseKeyboard) before the call to ParseKeyboard in MainLoop. */
 
 DWORD parseKeyboardInjAddress = 0x004A8225;
 int parseKeyboardInjNopCount = 0;
