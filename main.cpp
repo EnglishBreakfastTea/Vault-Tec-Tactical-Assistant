@@ -62,7 +62,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPTSTR cmdLine, i
     char dllPath[MAX_PATH + 1] = {0};
 
     GetCurrentDirectory(MAX_PATH, workingDir);
-    snprintf(exePath, MAX_PATH, "\"%s\\FOnline 2.exe\"", workingDir);
+    snprintf(exePath, MAX_PATH, "\"%s\\FOnlineGL.exe\"", workingDir);
     snprintf(dllPath, MAX_PATH, "libVaultTecTacticalAssistant.dll");
 
     si.cb = sizeof(STARTUPINFO);

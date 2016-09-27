@@ -27,9 +27,9 @@ struct Critter {
     uint16_t x; // at 0x6
     uint16_t y; // at 0x8
     uint16_t _padding2;
-    uint32_t _padding3[1064];
-    Hand* hand; // at 0x10ac
-}; // size: 0x10b0
+    uint32_t _padding3[1065];
+    Hand* hand; // at 0x10b0
+}; // size: 0x10b4
 
 struct HexManager {
     /* Returns the critter currently pointed by the mouse cursor or nullptr if there is none. */
@@ -44,6 +44,8 @@ struct HexManager {
     uint32_t _padding[28];
     uint32_t playerCritterId; // at 0x120; could be inside FOClient
 }; // size: 0x124
+
+struct KeyboardState;
 
 struct FOClient {
     /* Move the player to the given position. */
@@ -60,17 +62,16 @@ struct FOClient {
     uint32_t _padding2[62];
     uint32_t gameMode; // at 0x23c; menu/world map/encounter/loading/etc.(?)
     uint32_t mouseMode; // at 0x240; click/move/attack/use on etc.
-    uint32_t _padding3[11621];
-    Critter* playerCritter; // at 0xb7d8
-}; // size: 0xb7dc
-
-struct KeyboardState;
+    uint32_t _padding3;
+    KeyboardState* keyboardState; // at 0x248
+    KeyboardState* newKeyboardState; // at 0x24C
+    uint32_t _padding4[6766];
+    Critter* playerCritter; // at 0x6c08
+}; // size: 0x6c0C
 
 struct FOWindow {
     uint32_t _padding[41];
     uint32_t windowActive; // at 0xa4
-    KeyboardState* keyboardState; // at 0xa8
-    KeyboardState* newKeyboardState; // at 0xac
 }; // size: 0xb0
 
 /* String structure mimicking the one passed to DrawText. */

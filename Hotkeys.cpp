@@ -73,8 +73,7 @@ void parseKeyboard(FOClient* client)
         }
 
         // If our hotkey is down, we tell the game that nothing has changed with the keyboard state.
-        auto window = mainWindow();
-        window->newKeyboardState = window->keyboardState;
+        client->newKeyboardState = client->keyboardState;
     }
 
     return;

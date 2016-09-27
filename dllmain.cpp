@@ -11,7 +11,7 @@
 
 /* We insert a call to our code (mainLoop) before the call to ParseMouse in MainLoop. */
 
-DWORD mainLoopInjAddress = 0x004A822C;
+DWORD mainLoopInjAddress = 0x004971F2;
 int mainLoopInjNopCount = 0;
 extern "C" {
     void _stdcall mainLoopCWrapper(FOClient* client) { mainLoop(client); }
@@ -28,7 +28,7 @@ __asm(
 "popad;"
 
 "push eax;"
-"mov eax, 0x004972B0;" // FOClient::ParseMouse
+"mov eax, 0x00486790;" // FOClient::ParseMouse
 "call eax;"
 "pop eax;"
 "ret;"
@@ -37,7 +37,7 @@ __asm(
 /* We insert a call to our code (lMouseDown) before the call to GameLMouseDown in ParseMouse.
  * The code may decide for the call to GameLMouseDown to not be performed. */
 
-DWORD lMouseDownInjAddress = 0x497f02;
+DWORD lMouseDownInjAddress = 0x00487402;
 int lMouseDownInjNopCount = 0;
 extern "C" {
     /* Returns 1 if the GameLMouseDown call should be performed, 0 otherwise. */
@@ -65,7 +65,7 @@ __asm(
 "je vtta_lmd_end;"
 
 "push eax;"
-"mov eax, 0x004D5DD0;" // FOClient::GameLMouseDown
+"mov eax, 0x004C4C80;" // FOClient::GameLMouseDown
 "call eax;"
 "pop eax;"
 
@@ -77,7 +77,7 @@ __asm(
 
 /* We insert a call to our code (drawIface) before the call to RunPrepared in DrawIfaceLayer. */
 
-DWORD drawIfaceInjAddress = 0x468ec2;
+DWORD drawIfaceInjAddress = 0x00457A72;
 int drawIfaceInjNopCount = 0;
 extern "C" {
     void _stdcall drawIfaceCWrapper(FOClient* client) { drawIface(client); }
@@ -94,7 +94,7 @@ __asm(
 "popad;"
 
 "push eax;"
-"mov eax, 0x0051B9E0;" //Script::RunPrepared
+"mov eax, 0x0050AEB0;" //Script::RunPrepared
 "call eax;"
 "pop eax;"
 "ret;"
@@ -102,7 +102,7 @@ __asm(
 
 /* We insert a call to our code (parseKeyboard) before the call to ParseKeyboard in MainLoop. */
 
-DWORD parseKeyboardInjAddress = 0x004A8225;
+DWORD parseKeyboardInjAddress = 0x004971EB;
 int parseKeyboardInjNopCount = 0;
 extern "C" {
     void _stdcall parseKeyboardCWrapper(FOClient* client) { parseKeyboard(client); }
@@ -119,7 +119,7 @@ __asm(
 "popad;"
 
 "push eax;"
-"mov eax, 0x00496510;" // FOClient::ParseKeyboard
+"mov eax, 0x00485A00;" // FOClient::ParseKeyboard
 "call eax;"
 "pop eax;"
 "ret;"

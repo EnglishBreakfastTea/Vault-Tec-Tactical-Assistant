@@ -107,21 +107,21 @@ void drawString(std::string str, uint32_t x, uint32_t y, uint32_t width, uint32_
 
 FOWindow* mainWindow()
 {
-    uint32_t constexpr MainWindowPtrAddr = 0x02F79A24;
+    uint32_t constexpr MainWindowPtrAddr = 0x02F6F32C;
     auto ptr = reinterpret_cast<FOWindow**>(MainWindowPtrAddr);
     return *ptr;
 }
 
-uint32_t constexpr FastTickAddr = 0x00538940;
-uint32_t constexpr IsActionAddr = 0x00472110;
-uint32_t constexpr SetActionAddr = 0x0048DDE0;
-uint32_t constexpr GetSmthPixelAddr = 0x00504C40;
-uint32_t constexpr GetCritterAddr = 0x004800C0;
-uint32_t constexpr DrawTextAddr = 0x004763E0;
-uint32_t constexpr RebuildMapAddr = 0x00505F70;
+uint32_t constexpr FastTickAddr = 0x00528110;
+uint32_t constexpr IsActionAddr = 0x00460F10;
+uint32_t constexpr SetActionAddr = 0x0047D250;
+uint32_t constexpr GetSmthPixelAddr = 0x004F33E0;
+uint32_t constexpr GetCritterAddr = 0x0046F880;
+uint32_t constexpr DrawTextAddr = 0x004651A0;
+uint32_t constexpr RebuildMapAddr = 0x004F4740;
 
-uint32_t constexpr MouseXAddr = 0x008520C4;
-uint32_t constexpr MouseYAddr = 0x008520C8;
+uint32_t constexpr MouseXAddr = 0x00847B84;
+uint32_t constexpr MouseYAddr = 0x00847B88;
 
 FastTick fastTick = reinterpret_cast<FastTick>(FastTickAddr);
 IsAction isAction = reinterpret_cast<IsAction>(IsActionAddr);
