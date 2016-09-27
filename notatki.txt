@@ -179,6 +179,10 @@ ważne struktury i niektóre pola:
 	FOWindow:
 		windowActive: czy okno gry jest aktywne/sfocusowane
 		
+	Item:
+		instancje tej struktury są statycznie w pamięci programu
+		range: uint32_t, zasięg itemu
+
 zmienić na losowe stringi w pamięci przed uruchomieniem, żeby móc uruchomić wiele instancji klienta:
 	"fonline_instance"
 	"_fosync_"
@@ -293,7 +297,8 @@ jak znaleźć offsety w strukturach:
 		mode: niedaleko od początku (np. 0x30), zmienia się gdy zmieniamy między trybami single/burst/aimed/reload
 	Item
 		itemId (nazwa raczej niepoprawna): patrzymy na heldItem z powyższego; nuff said
-		
+		range: patrzymy na playerCritter->hand->heldItem; zmieniając bronie szukamy zmieniającej się wartości równej zasięgowi
+
 	keyboardState, newKeyboardState:
 		mogą być w FOClient lub w FOWindow
 		na początku ParseKeyboard, tuż po cmp windowActive z 0 (patrz FOWindow.windowActive) jest cmp keyboardState z newKeyboardState
@@ -353,6 +358,7 @@ adresy i offsety:
 			mode 0x30
 		Item
 			itemId 0x0
+			range 0x324
 			
 	Reloaded FOnlineGL.exe:
 		AddAction +76DF0
@@ -405,6 +411,7 @@ adresy i offsety:
 			mode 0x30
 		Item
 			itemId 0x0
+			range 0x324
 
 	FOnline 2.exe:
 		AddAction +878D0
@@ -445,6 +452,10 @@ adresy i offsety:
 
 		FOWindow:
 			windowActive 0xa4
+
+		Item:
+			itemId 0x0
+			range 0x324
 
 		fonline_instance +3433B4
 		_fosync_ +33BCDC
