@@ -1,0 +1,446 @@
+ważne funkcje:
+	FOClient::AddAction
+		_thiscall
+		
+	FOClient::AddActioBack
+		_thiscall
+		
+	FOClient::SetAction
+		_thiscall
+		argumenty:
+			1. typ akcji
+				1 = ACTION_MOVE
+				6 = atak bez aima (??) (może być autoaim)
+				10 = skill
+			2. zależnie od typu akcji:
+				jeśli ruch, to wsp. 1
+				jeśli atak, to id związane z używanym przedmiotem (playerCritter->hand->heldItemId)
+				jeśli skill, to jaki skill
+			3. zależnie od typu akcji:
+				jeśli ruch, to wsp. 2
+				jeśli atak, to inne id związane z przedmiotem (playerCritter->hand->heldItemId->itemId)
+				jeśli skill, to critterId
+			4. zależnie od typu akcji:
+				jeśli ruch, to 1 = bieg, 0 = chód
+				jeśli atak, to zawsze 2
+				jeśli skill, to zawsze 0?
+			5. zależnie od typu akcji:
+				jeśli ruch, to zawsze 0
+				jeśli atak to critterId
+				jeśli skill, to zawsze 0?
+			6.
+				jeśli ruch, to czy nie był już w trakcie ruchu
+				jeśli skill, to zawsze 0?
+				jeśli atak:
+					w zwykłym trybie 0 - single, 1 - burst, nawet jak autoaim
+					w trybie celowania - zależy od celu. 1 bajt
+						torso 0x40
+						groin 0x80
+						left arm 0x20
+						left leg 0x60
+						right leg 0x50
+						right arm 0x30
+						eyes 0x70
+						head 0x10
+			7.
+				jeśli ruch, to czas
+				jeśli skill, to zawsze 0?
+				jeśli atak, to zawsze 0
+		
+	FOClient::GameLMouseDown
+		_thiscall
+		
+	FOClient::AimLMouseUp
+		_thiscall
+		wywoływane, kiedy puszczamy lewy przycisk myszy na ekranie celowania
+		
+	FOClient::ParseMouse
+		_thiscall
+
+	FOClient::ParseKeyboard
+		_thiscall
+		wykonuje następujący kod (w FOnline 2), żeby sprawdzić czy coś zostało wciśnięte:
+			mov ecx,[edx+a8] (u mnie "keyboardState")
+			cmp ecx,[edx+ac] (u mnie "newKeyboardState")
+			je ...
+		żeby oszukać grę, wystarczy przed wywołaniem ParseKeyboard przypisać newKeyboardState = keyboardState
+		
+	FOClient::MainLoop
+		_thiscall
+		
+	FOClient::IsAction
+		_thiscall
+		oprócz this przyjmuje jeden argument na stosie (co?)
+		powinien zwrócić: czy nie był w trakcie ruchu/akcji?
+		zanegowany wynik tego wywoływania jest przekazywany przez GameLMouseDown do SetAction w 6 argumencie (gdy akcja = ruch)
+		
+	Timer::FastTick
+		_stdcall (chyba)
+		zwraca czas
+
+	HexManager::GetSmthPixel
+		_thiscall
+		wyniki zwraca przez referencję
+		argumenty oprócz this:
+			1. mouse x
+			2. mouse y
+			3. referencja dla zwracanego wsk. do przedmiotu (gdyby pod pikselem nie było crittera)
+			4. referencja dla zwracanego wsk. do crittera
+			
+	HexManager::GetCritter
+		_thiscall
+		zwraca crittera
+		jeden argument: id crittera
+	
+	
+	FOClient::SScriptFunc::Global_DrawText
+		_cdecl
+		wymaga FOClient::SpritesCanDraw == 1
+		ustawione w FOClient::DrawIfaceLayer (FOnline 2):
+			mov byte ptr ["FOnline 2.FOClient::SpritesCanDraw"],01
+			call "FOnline 2.Script::SetArgUInt"
+			add esp,04
+			call "FOnline 2.Script::RunPrepared" 					-- w środku będzie wywołanie Global_DrawText
+			mov byte ptr ["FOnline 2.FOClient::SpritesCanDraw"],00
+
+		argumenty:
+			1. tekst
+				może w nim wystąpić specyfikacja koloru: "|liczba tekst"
+
+				użycie argumentu w funkcji:
+				mov eax,[ebp+8]
+				mov ecx,[eax+18]
+				push ecx
+				ecx w tym momencie wskazuje na tekst do wypisania.
+				w wielu przypadkach ecx = eax+4 dla krótkich stringów
+				wygląda na std::string z SSO (Short String Optimization)
+			2. pozycja x
+			3. pozycja y
+			4. szerokość
+			5. wysokość
+			6. specyfikacja koloru np. 0xff00aa00, 0xff8f6f0, 0xffababab, 0xffffffff
+				w tekście też może wystąpić specyfikacja koloru (w formacie dziesiętnym), która ma pierwszeństwo
+			7. czcionka
+				0xFFADADB9 - kolor szary
+				0xFF00AA00 - zielony używany w wielu miejscach
+			8. ciąg flag bitowych
+				4 = 3. bit wyśrodkowanie w poziomie
+				8 = 4. bit wyśrodkowanie w pionie
+				16 = 5. bit do prawej, wyśrodkowanie ma pierwszeństwo
+				32 = 6. bit do dołu, wyśrodkowanie ma pierwszeństwo
+				512 = 9. bit obramowanie
+
+				np. "First Aid:" 560 = 100110000 = 512 + 32 + 16
+				"Aim: Eyes" 12 = 8 + 4
+				nick: 548 = 512 + 32 + 4
+
+	HexManager::RebuildMap
+		_thiscall
+		argumenty:
+			1. screen x
+			2. screen y
+		wywołamy, gdy chcemy np. przesunąć widok
+		
+	Script::RunPrepared
+		_stdcall (chyba)
+		binding do AngelScriptu
+		
+	FOClient::DrawIfaceLayer
+		_thiscall
+
+ważne struktury i niektóre pola:
+	FOClient:
+		hexManager: HexManager (w miejscu, nie wskaźnik)
+		gameMode: uint32_t, czy menu/WM/enco itd.
+			menu = 1
+			enco = 5
+			WM = 6
+			ładowanie = 7
+		mouseMode: uint32_t,
+			0 = zwykły wskaźnik
+			1 = ruch
+			2 = use on
+			3 = atak
+			4 = użycie skilla
+			5 = oczekiwanie (zegarek)
+			6 = rączka w inventory
+		previousMouseMode?
+		playerCritter: Critter*
+
+	HexManager:
+		screenX: uint32_t, wsp. x hexa nad którym jest kamera
+		screenY: uint32_t, wsp. y hexa nad którym jest kamera
+			należy wywołać RebuildMap z tymi wartościami żeby odświeżyć widok
+		playerCritterId: uint32_t
+			możliwe że to tak naprawdę pole FOClient, choć w asm odwołania są przez wskaźnik do HexManager
+
+	FOWindow:
+		windowActive: czy okno gry jest aktywne/sfocusowane
+		
+zmienić na losowe stringi w pamięci przed uruchomieniem, żeby móc uruchomić wiele instancji klienta:
+	"fonline_instance"
+	"_fosync_"
+		
+jak znaleźć globalne adresy:
+	znajdujemy cel y
+		unknown initial value
+		poruszamy postać 1 hex w kierunku góra-lewo
+		increased by 1
+		powtarzamy
+		powinny zostać 2-3 wartości
+		klikamy daleko, szukana wartość zmienia się natychmiastowo na cel, pozostałe dwie zmieniają się wraz z ruchem postaci
+
+	memory breakpoint, sprawdzamy kto pisze do celu y - AddAction
+	AddAction jest wywołane w AddActionBack
+	AddActionBack jest wywołane w SetAction
+	SetAction jest wywołane w SetAction
+	SetAction jest wywołane w GameLMouseDown
+	GameLMouseDown jest wywołane w ParseMouse
+	ParseMouse jest wywołane w MainLoop
+	ParseKeyboard tuż przed wywołaniem ParseMouse
+
+	kto z niego czyta - CrittersProcess
+	CrittersProcess wywołane z MainLoop
+
+	DrawStr:
+		wychodzimy do menu
+		wpisujemy coś w nickname
+		szukamy w pamięci od początku modułu (00400000), pierwsze wystąpienie
+		memory breakpoint - co czyta, powinny być 3 miejsca, jedno z nich to cmp do 0 w DrawStr
+	Global_DrawText:
+		użyć FirstAid, żeby pojawił się cooldown
+		na początku DrawStr wskaźnik na tekst jest przenoszony ze stosu do rejestru (mov eax, [ebp+0C])
+		dać breakpoint za tą instrukcją, sprawdzać na co wskazuje ten wskaźnik
+		wznawiać grę do momentu, aż pojawi się FirstAid
+		iść do instrukcji ret: w ten sposób trafiamy do Global_DrawText
+	DrawIfaceLayer 7x nad wywołaniem Global_DrawText (7x ret)
+		funkcja jest krótka i pod koniec zawiera: mov, call, add, call, mov, pop, ret
+	RunPrepared - ostatni call w DrawIfaceLayer
+
+	globalny FOWindow**:
+		mov na początku ParseKeyboard
+		najpierw jest brany __security_cookie, potem MainWindow
+		następna instrukcja po wzięciu MainWindow to powinna być cmp do 0
+
+	wywołanie FastTick gdzieś w GameLMouseDown, FastTick skacze do KERNEL32.timeGetTime
+	wywołanie IsAction kilka instrukcji po pierwszym ret w GameLMouseDown: cmp, jne, push, mov, call
+	wywołanie GetSmthPixel w GameLMouseDown przed użyciem skilla. Szukaj "push 0A"
+	MouseX, MouseY tuż przed tym wywołaniem, brane z globalnych adresów (x niżej)
+
+	GetCritter wywoływane w CrittersProcess:
+		za odczytem celu y
+		dużo obliczeń (mov, movzx, cmp, setne)
+		potem bierze HexManager (lea a, [b+x]; x zwykle = 20), wrzuca critter id (push)
+		call
+		
+		break przy użyciu skilla na critterze (ale nie graczu)
+		
+	RebuildMap:
+		najpierw znajdujemy screenX (patrz niżej)
+		memory breakpoint - co pisze do screenX, powinno być 1 miejsce w RebuildMap
+			dla sprawdzenia: niedaleko przed tym miejscem powinno być wywołanie RunPrepared
+
+jak znaleźć offsety w strukturach:
+	najpierw znajdź globalne adresy, będą potrzebne
+	FOClient
+		hexManager przenoszony do ecx przed wywołaniem GetCritter w CrittersProcess
+		gameMode: porównanie z 5 na początku CrittersProcess, tuż za pierwszym mov z playerCritter (5 = encounter)
+			np. mov ecx, [ebx+b7d8] (playerCritter); test; je; cmp (..), 05
+		mouseMode: na początku GameLMouseDown
+			np. je; mov eax, [esi+240]; cmp eax, edi (edi = 0); jne
+		playerCritter: mov tuż przed odczytem celu y: je, mov, cmp, jne, cmp, je -> mov, mov, lea (cel y) w CrittersProcess
+			albo patrz wyżej na gameMode: inny mov (pierwszy w funkcji) tuż przed cmp gameMode z 5
+			albo mov na początku GameLMouseDown?
+
+	FOWindow
+		windowActive: na początku ParseKeyboard, po pierwszym mov jest cmp do 0
+			np. cmp byte ptr [edx+a4], 00
+			
+	HexManager
+		screenX, screenY:
+			szukamy unknown initial value
+			przesuwamy kamerą prawo-dół, szukamy increased value
+			lewo-góra, decreased value
+			szukamy niewielkich wartości niedaleko od początku HexManager
+			ALBO: obserwujemy pamięć na początku HexManager kiedy poruszamy kamerą
+		playerCritterId:
+			znajdź adres globalnego FOClient
+				np. przenoszony do ecx przed wywołaniem MainLoop
+			znajdź id crittera gracza
+				np. przed wywołaniem SetAction w GameLMouseDown kiedy używamy skilla na sobie, trzeci argument
+			poszukaj tego id w znalezionym FOClient, powinno być gdzieś między 0 a 0x200 (hexManager jest inline w FOClient)
+			odejmij offset hexManager
+	Critter
+		znajdź instancję crittera gracza (patrz wyżej FOClient.playerCritter)
+		critterId:
+			znajdż id crittera gracza (patrz wyżej notatki do HexManager.playerCritterId)
+			poszukaj offsetu w instancji crittera gracza (na początku, zwykle 0)
+		x, y:
+			popatrz jak wartości zmieniają się w instancji crittera gracza (na początku, zwykle 0x6 i 0x8, dwubajtowe)
+		hand:
+			w GameLMouseDown szukamy wywołania SetAction w przypadku ruchu (szukaj push 00, push, push, push, push 01, mov, call)
+			idziemy do pierwszego ret
+			instrukcja-dwie za tym ret jest cmp do 02, a potem je
+				np. mov ebx, 3; cmp eax, 2; je
+			skaczemy z tym je. Powinien być mov z crittera gracza + nasz offset (np. mov eax, [ecx+10ac]
+	Hand
+		znajdujemy crittera gracza, idziemy do offsetu gdzie jest hand (patrz wyżej)
+		obserwujemy jak zmienia się wskaźnik pod tym offsetem i wartości na które on wskazuje, kiedy zmieniamy w grze bronie
+		handItemId: duża liczba (w przypadku broni, w przypadku pustej ręki 0?) na początku, zwykle 0x0
+		heldItem: wskaźnik na początku, zwykle 0x4
+		mode: niedaleko od początku (np. 0x30), zmienia się gdy zmieniamy między trybami single/burst/aimed/reload
+	Item
+		itemId (nazwa raczej niepoprawna): patrzymy na heldItem z powyższego; nuff said
+		
+	keyboardState, newKeyboardState:
+		mogą być w FOClient lub w FOWindow
+		na początku ParseKeyboard, tuż po cmp windowActive z 0 (patrz FOWindow.windowActive) jest cmp keyboardState z newKeyboardState
+			np. w FOnline 2.exe: mov ecx,[edx+ac]; mov eax,[edx+a8]; lea; cmp eax, ecx. edx = FOWindow
+			np. w FOnline.exe (Reloaded): mov ecx, [esi+22c]; mov eax,[esi+228]; cmp eax, ecx. esi = FOClient
+
+adresy i offsety:
+	Reloaded FOnline.exe:
+		AddActionBack +75840
+		AddAction +75920
+		SetAction +78C60
+		SetAction +7BB40
+		GameLMouseDown +C2450
+		ParseMouse +84190
+			call GameLMouseDown +84DD5
+		ParseKeyboard +83580
+		MainLoop +94860
+			call ParseKeyboard +94B1B
+			call ParseMouse +94B22
+		main
+		DrawStr +42330
+		DrawTextOnHead +B49D0
+		Global_DrawText +63F80
+		DrawIfaceLayer +56350
+			call RunPrepared +56432
+		RunPrepared +1085E0
+		FastTick +126820
+		IsAction +5FBE0
+		GetSmthPixel +F0B70
+		CrittersProcess +7BB80
+		GetCritter +6E670
+		RebuildMap +F1F20
+		MouseX* 00869CF4
+		MouseY* 00869CF8
+		FOWindow** 0x02F9149C
+
+		FOClient
+			hexManager 0x20
+			gameMode 0x21c
+			mouseMode 0x220
+			playerCritter 0x6ba0
+		FOWindow
+			windowActive 0xa4
+		HexManager
+			screenX 0x88
+			screenY 0x8c
+			playerCritterId 0x100
+		Critter
+			critterId 0x0
+			x 0x6
+			y 0x8
+			hand 0x10b0
+		Hand
+			handItemId 0x0
+			heldItem 0x4
+			mode 0x30
+		Item
+			itemId 0x0
+			
+	Reloaded FOnlineGL.exe:
+		AddAction +76DF0
+		AddActionBack +76ED0
+		SetAction +7A300
+		SetAction +7D250
+		GameLMouseDown +C4C80
+		FastTick +128110
+		ParseMouse +86790
+		ParseKeyboard +85A00
+			call GameLMouseDown +87402
+		MainLoop +96F30
+			call ParseKeyboard +971EB
+			call ParseMouse +971F2
+		main +1005F0
+		IsAction +60F10
+		GetSmthPixel +F33E0
+		CrittersProcess +7D290
+		GetCritter +6F880
+		DrawStr +436D0
+		Global_DrawText +651A0
+		DrawIfaceLayer +57A40
+			call RunPrepared +57A72
+		RunPrepared +10AEB0
+		RebuildMap +F4740
+		MouseX* 847B84
+		MouseY* 847B88
+		FOWindow** 02F6F32C
+
+		FOClient
+			hexManager 0x20
+			gameMode 0x23C
+			mouseMode 0x240
+			playerCritter 0x6c08
+		FOWindow
+			windowActive 0xa4
+		HexManager
+			screenX 0xa8
+			screenY 0xac
+			playerCritterId 0x120
+		Critter
+			critterId 0x0
+			x 0x6
+			y 0x8
+			hand 0x10b0
+		Hand
+			handItemId 0x0
+			heldItem 0x4
+			mode 0x30
+		Item
+			itemId 0x0
+
+	FOnline 2.exe:
+		AddAction +878D0
+		AddActioBack +879B1
+		SetAction +8ADA0
+		GameLMouseDown +D5DD0
+		ParseMouse +972B0
+		ParseKeyboard +96510
+			call GameLMouseDown +97F02
+		MainLoop +A7F70
+			call ParseKeyboard +A8225
+			call ParseMouse +A822C
+		IsAction +72110
+		FastTick +138940
+		main +111740
+		CrittersProcess +8DE20
+		GetCritter +800C0
+		Global_DrawText +763E0
+		DrawIfaceLayer +68E90
+			call RunPrepared +68EC2
+		RunPrepared +11B9E0
+		RebuildMap +105F70
+		GetSmthPixel +104c40
+		MouseX* 8520C4
+		MouseY* 8520C8
+		FOWindow** 02F79A24
+
+		FOClient:
+			hexManager 0x20
+			gameMode 0x23c
+			mouseMode 0x240
+			playerCritter 0xb7d8
+
+		HexManager:
+			screenX 0xa8
+			screenY 0xac
+			playerCritterId 0x120
+
+		FOWindow:
+			windowActive 0xa4
+
+		fonline_instance +3433B4
+		_fosync_ +33BCDC
