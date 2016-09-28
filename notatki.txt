@@ -42,6 +42,8 @@ ważne funkcje:
 						right arm 0x30
 						eyes 0x70
 						head 0x10
+						dolne 4 bity są zawsze 0.
+					Dolne 4 bity są indeksem w tablicy range (patrz Item w opisie struktur)
 			7.
 				jeśli ruch, to czas
 				jeśli skill, to zawsze 0?
@@ -181,7 +183,7 @@ ważne struktury i niektóre pola:
 		
 	Item:
 		instancje tej struktury są statycznie w pamięci programu
-		range: uint32_t, zasięg itemu
+		range: tablica uint32_t, trzyma zasięg dla poszczególnych trybów (burst/single), długość conajmniej 2
 
 zmienić na losowe stringi w pamięci przed uruchomieniem, żeby móc uruchomić wiele instancji klienta:
 	"fonline_instance"
@@ -452,6 +454,11 @@ adresy i offsety:
 
 		FOWindow:
 			windowActive 0xa4
+
+		Hand:
+			handItemId 0x0
+			heldItem 0x4
+			mode 0x30
 
 		Item:
 			itemId 0x0

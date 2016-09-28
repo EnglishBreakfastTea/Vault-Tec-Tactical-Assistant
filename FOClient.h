@@ -9,8 +9,8 @@
 struct Item {
     uint32_t itemId;
     uint32_t _padding[200];
-    uint32_t range; // at 0x324
-}; // size: 0x328
+    uint32_t range[2]; // at 0x324
+}; // size: 0x32C
 
 struct Hand { // I don't know what this is, but it points to the held item, so I called it Hand.
     uint32_t handItemId; // Don't know how I should call it.

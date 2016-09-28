@@ -24,7 +24,7 @@ void toggle1hexv2()
 {
     std::map<uint32_t, uint32_t> static patches;
 
-    auto getHeldItem = [](FOClient* client) -> Item* {
+    auto static getHeldItem = [](FOClient* client) -> Item* {
         auto player = client->playerCritter;
         if (!player) {
             return nullptr;
@@ -43,32 +43,34 @@ void toggle1hexv2()
         return heldItem;
     };
 
-    auto HexPatchHook = [getHeldItem](FOClient* client) {
+    auto static HexPatchHook = [](FOClient* client) {
         auto heldItem = getHeldItem(client);
         if (!heldItem) {
             return false;
         }
 
-        auto rangeAddress = reinterpret_cast<uint32_t>(&heldItem->range);
+        auto rangeIx = client->playerCritter->hand->mode & 0xF;
+        auto rangeAddress = reinterpret_cast<uint32_t>(&heldItem->range[rangeIx]);
         if (patches.find(rangeAddress) != std::end(patches)) {
             // Patch already installed.
             return false;
         }
 
         // We patch the item's range, changing it to 1.
-        patches[rangeAddress] = heldItem->range;
-        heldItem->range = 1;
+        patches[rangeAddress] = heldItem->range[rangeIx];
+        heldItem->range[rangeIx] = 1;
 
         return false;
     };
 
-    auto HexUnpatchHook = [getHeldItem](FOClient* client) {
+    auto static HexUnpatchHook = [](FOClient* client) {
         auto heldItem = getHeldItem(client);
         if (!heldItem) {
             return false;
         }
 
-        auto rangeAddress = reinterpret_cast<uint32_t>(&heldItem->range);
+        auto rangeIx = client->playerCritter->hand->mode & 0xF;
+        auto rangeAddress = reinterpret_cast<uint32_t>(&heldItem->range[rangeIx]);
         auto patch = patches.find(rangeAddress);
         if (patch == std::end(patches)) {
             // No patch applied.
@@ -76,7 +78,7 @@ void toggle1hexv2()
         }
 
         // We remove the patch, changing the item's range to the original one.
-        heldItem->range = patch->second;
+        heldItem->range[rangeIx] = patch->second;
         patches.erase(patch);
         return false;
     };
