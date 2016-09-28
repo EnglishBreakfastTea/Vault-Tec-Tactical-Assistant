@@ -212,6 +212,12 @@ void mainLoop(FOClient* client)
     }
 
     {
+        if (*msg == "toggle 1hexv2") {
+            toggle1hexv2();
+        }
+    }
+
+    {
         using namespace boost::spirit;
         using qi::ascii::char_;
         using qi::ascii::space_type;
